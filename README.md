@@ -1,10 +1,8 @@
 # CPD Projects
 
-CPD Projects of group T&lt;m&gt;&lt;n&gt;G&lt;p&gt;&lt;q&gt;.
+CPD Projects of group T09G05.
 
 Group members:
 
-1. &lt;first name&gt; &lt;family name&gt; (&lt;email address&gt;)
-2. &lt;first name&gt; &lt;family name&gt; (&lt;email address&gt;)
-3. &lt;first name&gt; &lt;family name&gt; (&lt;email address&gt;)
-4. &lt;first name&gt; &lt;family name&gt; (&lt;email address&gt;)
+1. Maria Carneiro (up201907726@edu.fe.up.pt )
+2. Rodrigo Andrade (up201904967@fe.up.pt)
