@@ -171,12 +171,11 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
 
 
 
-    Time1 = omp_get_wtime();
+    Time1 = clock();
 
-    #pragma omp parallel for 
     for(bi = 0; bi < m_ar; bi += bkSize)
-    {   for(bj = 0; bj < m_br; bj += bkSize)
-        {   for(bk = 0; bk < m_ar; bk += bkSize)
+    {   for(bk = 0; bk < m_ar; bk += bkSize)
+        {   for(bj = 0; bj < m_br; bj += bkSize)
             {   
                 for(i=0; i<bkSize; i++)
                 {	for( k=0; k<bkSize; k++)
@@ -191,8 +190,8 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
         }
     }
 
-    Time2 = omp_get_wtime();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
+    Time2 = clock();
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
 	cout << st;
 
 	// display 10 elements of the result matrix tto verify correctness
