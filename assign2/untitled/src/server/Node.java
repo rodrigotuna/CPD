@@ -13,29 +13,25 @@ import java.rmi.server.UnicastRemoteObject;
 public class Node implements MembershipInterface {
 
     private final InetSocketAddress membershipAddress;
+    private final InetSocketAddress accessPoint;
     private final MulticastSocket membershipSocket;
-    private final String accessPoint;
-    private final int port;
 
-    private int membershipCounter;
-    public Node(InetSocketAddress membershipAddress, String accessPoint, int port) throws IOException, AlreadyBoundException {
+    public Node(InetSocketAddress membershipAddress, InetSocketAddress accessPoint) throws IOException, AlreadyBoundException {
 
         this.membershipAddress = membershipAddress;
         this.membershipSocket = new MulticastSocket(membershipAddress.getPort());
-
         membershipSocket.joinGroup(membershipAddress.getAddress());
 
         this.accessPoint = accessPoint;
-        this.port = port;
 
         MembershipInterface stub = (MembershipInterface) UnicastRemoteObject.exportObject(this, 0);
 
         Registry registry = LocateRegistry.getRegistry();
-        registry.bind(accessPoint, stub);
+        registry.bind(accessPoint.toString(), stub);
     }
 
     public void join() throws IOException {
-        membershipSocket.send(new DatagramPacket("hahahaha".getBytes(StandardCharsets.UTF_8),8));
+        //membershipSocket.send();
     }
 
     public void leave() throws RemoteException{
