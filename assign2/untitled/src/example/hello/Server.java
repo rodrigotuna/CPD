@@ -35,11 +35,10 @@
  * intended for use in the design, construction, operation or
  * maintenance of any nuclear facility.
  */
-package hello;
+package example.hello;
 
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Server implements Hello {
