@@ -33,11 +33,12 @@ public class MulticastSocketHandler implements Runnable{
                 Message message = messageParser.parse(packet);
                 switch(message.getType()){
                     case "MEMBERSHIP":
-                        //Acho que é a única, isto é parvo mas no TCP já faz sentido;
-                        // so nao sei receber msgs por TCP;
+                        break;
                     case "JOIN":
+                        break;
 
                     case "LEAVE":
+                        break;
                 }
 
             } catch (IOException e) {
