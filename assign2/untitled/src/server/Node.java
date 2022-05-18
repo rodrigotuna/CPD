@@ -1,5 +1,9 @@
 package server;
 
+import server.handler.MembershipHandler;
+import server.message.JoinMessage;
+import server.message.Message;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
@@ -20,18 +24,24 @@ public class Node implements MembershipInterface {
 
         this.membershipAddress = membershipAddress;
         this.membershipSocket = new MulticastSocket(membershipAddress.getPort());
-        membershipSocket.joinGroup(membershipAddress.getAddress());
 
         this.accessPoint = accessPoint;
 
         MembershipInterface stub = (MembershipInterface) UnicastRemoteObject.exportObject(this, 0);
 
         Registry registry = LocateRegistry.getRegistry();
-        registry.bind(accessPoint.toString(), stub);
+        registry.bind(getAccessPoint(), stub);
     }
 
     public void join() throws IOException {
-        //membershipSocket.send();
+        membershipSocket.send(new JoinMessage("JOIN" , getAccessPoint(),  membershipAddress).getDatagram());
+
+        membershipSocket.joinGroup(membershipAddress.getAddress());
+        MembershipHandler membershipHandler = new MembershipHandler(membershipSocket, this);
+        Thread membershipThread = new Thread(membershipHandler);
+        membershipThread.start();
+
+
     }
 
     public void leave() throws RemoteException{
@@ -50,4 +60,7 @@ public class Node implements MembershipInterface {
     public void delete(String hashcode) throws RemoteException{
     }
 
+    public String getAccessPoint() {
+        return accessPoint.toString().substring(1);
+    }
 }

@@ -1,7 +1,10 @@
 package server.message;
 
-public class JoinMessage {
-    JoinMessage(String node, int port){
+import java.net.InetSocketAddress;
 
+public class JoinMessage extends Message{
+
+    public JoinMessage(String type, String senderId, InetSocketAddress socketAddress) {
+        super(type, senderId, socketAddress);
     }
 }
