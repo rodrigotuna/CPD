@@ -26,7 +26,7 @@ public class JoinHandler implements Runnable{
 
                 int tries = 0;
                 while(logsReceived < 3 && tries < 3){
-                    //wait(1000,0);
+                    Thread.sleep(1000);
                     tries++;
                 }
 
@@ -37,7 +37,7 @@ public class JoinHandler implements Runnable{
                 }
             }
             node.StartMembershipSocket();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

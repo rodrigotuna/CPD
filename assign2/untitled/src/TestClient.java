@@ -24,10 +24,8 @@ public class TestClient {
                 switch(functionArgs.getOperation()) {
                     case "join":
                         node.join();
-                        break;
                     case "leave":
                         node.leave();
-                        break;
                 }
             } else {
                 Client client = new Client(functionArgs.getNodeAccessPoint());
@@ -38,10 +36,8 @@ public class TestClient {
                         break;
                     case "get":
                         client.get(functionArgs.getHashcode());
-                        break;
                     case "delete":
                         client.delete(functionArgs.getHashcode());
-                        break;
                 }
             }
 
