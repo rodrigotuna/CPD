@@ -22,18 +22,24 @@ public class TestClient {
                 switch(functionArgs.getOperation()) {
                     case "join":
                         node.join();
+                        break;
                     case "leave":
                         node.leave();
+                        break;
                 }
             } else {
                 Client client = new Client(functionArgs.getNodeAccessPoint());
                 switch(functionArgs.getOperation()){
                     case "put":
-                        client.put(functionArgs.getFilePathname());
+                        String fileKey = client.put(functionArgs.getFilePathname());
+                        System.out.println(fileKey);
+                        break;
                     case "get":
                         client.get(functionArgs.getHashcode());
+                        break;
                     case "delete":
                         client.delete(functionArgs.getHashcode());
+                        break;
                 }
             }
 
