@@ -8,6 +8,6 @@ import java.rmi.RemoteException;
 public interface MembershipInterface extends Remote {
     void join() throws IOException;
 
-    void leave() throws RemoteException;
+    void leave() throws IOException;
 
 }

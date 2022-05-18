@@ -1,13 +1,12 @@
 package server;
 
-import server.handler.MembershipHandler;
+import server.handler.MulticastHandler;
+import server.handler.TCPHandler;
 import server.message.JoinMessage;
-import server.message.Message;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -17,8 +16,8 @@ import java.rmi.server.UnicastRemoteObject;
 public class Node implements MembershipInterface {
 
     private final InetSocketAddress membershipAddress;
-    private final InetSocketAddress accessPoint;
     private final MulticastSocket membershipSocket;
+    private final InetSocketAddress accessPoint;
 
     public Node(InetSocketAddress membershipAddress, InetSocketAddress accessPoint) throws IOException, AlreadyBoundException {
 
@@ -34,33 +33,31 @@ public class Node implements MembershipInterface {
     }
 
     public void join() throws IOException {
-        membershipSocket.send(new JoinMessage("JOIN" , getAccessPoint(),  membershipAddress).getDatagram());
+        membershipSocket.send(new JoinMessage("JOIN" , getAccessPoint(),  membershipAddress).getDatagram());;
 
-        membershipSocket.joinGroup(membershipAddress.getAddress());
-        MembershipHandler membershipHandler = new MembershipHandler(membershipSocket, this);
-        Thread membershipThread = new Thread(membershipHandler);
-        membershipThread.start();
+        Socket socket = new Socket(accessPoint.getAddress(), accessPoint.getPort());
+        //Thread receiveLogThread = new Thread(new TCPHandler(socket, ));
 
 
     }
 
-    public void leave() throws RemoteException{
+    public void leave() throws IOException {
+        membershipSocket.leaveGroup(membershipAddress.getAddress());
 
-    }
-
-
-    //Not sure if it is like this
-    public String put(File file) throws RemoteException {
-        return "";
-    }
-
-    public void get(String hashcode) throws RemoteException {
-    }
-
-    public void delete(String hashcode) throws RemoteException{
     }
 
     public String getAccessPoint() {
         return accessPoint.toString().substring(1);
+    }
+
+    public void StartMembershipSocket() throws IOException {
+        membershipSocket.joinGroup(membershipAddress.getAddress());
+        MulticastHandler membershipHandler = new MulticastHandler(membershipSocket, this);
+        Thread membershipThread = new Thread(membershipHandler);
+        membershipThread.start();
+    }
+
+    public void StartTCPSocket() throws IOException {
+        Socket socket = new Socket(accessPoint.getAddress(), accessPoint.getPort());
     }
 }
