@@ -28,4 +28,7 @@ public abstract class Message {
         return new DatagramPacket(buffer,buffer.length, socketAddress);
     }
 
+    public String getType() {
+        return type;
+    }
 }

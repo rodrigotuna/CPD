@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 
-public class MulticastHandler implements Runnable{
+public class MulticastSocketHandler implements Runnable{
 
     private final MulticastSocket membershipSocket;
     private final Node node;
 
-    public MulticastHandler(MulticastSocket membershipSocket, Node node){
+    public MulticastSocketHandler(MulticastSocket membershipSocket, Node node){
         this.membershipSocket = membershipSocket;
         this.node = node;
     }
@@ -31,7 +31,14 @@ public class MulticastHandler implements Runnable{
                 membershipSocket.receive(packet);
                 //TODO
                 Message message = messageParser.parse(packet);
-                //messageHandler.handle(message, node);
+                switch(message.getType()){
+                    case "MEMBERSHIP":
+                        //Acho que é a única, isto é parvo mas no TCP já faz sentido;
+                        // so nao sei receber msgs por TCP;
+                    case "JOIN":
+
+                    case "LEAVE":
+                }
 
             } catch (IOException e) {
                 throw new RuntimeException(e);

@@ -2,6 +2,8 @@ import client.Client;
 import client.TestClientArgs;
 import server.MembershipInterface;
 
+import java.io.IOException;
+import java.net.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
