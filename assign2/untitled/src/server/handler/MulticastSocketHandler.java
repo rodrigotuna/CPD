@@ -1,8 +1,8 @@
 package server.handler;
 
 import server.Node;
+import server.message.JoinMessage;
 import server.message.Message;
-import server.message.MessageHandler;
 import server.message.MessageParser;
 
 import java.io.IOException;
@@ -18,13 +18,14 @@ public class MulticastSocketHandler implements Runnable{
         this.membershipSocket = membershipSocket;
         this.node = node;
     }
+
+
     @Override
     public void run() {
 
         byte[] buffer = new byte[1000];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         MessageParser messageParser = new MessageParser();
-        MessageHandler messageHandler = new MessageHandler();
 
         while(true){
             try {
@@ -35,8 +36,8 @@ public class MulticastSocketHandler implements Runnable{
                     case "MEMBERSHIP":
                         break;
                     case "JOIN":
+                        new JoinMessageHandler((JoinMessage) message);
                         break;
-
                     case "LEAVE":
                         break;
                 }
@@ -46,4 +47,5 @@ public class MulticastSocketHandler implements Runnable{
             }
         }
     }
+
 }

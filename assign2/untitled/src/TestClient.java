@@ -24,8 +24,10 @@ public class TestClient {
                 switch(functionArgs.getOperation()) {
                     case "join":
                         node.join();
+                        break;
                     case "leave":
                         node.leave();
+                        break;
                 }
             } else {
                 Client client = new Client(functionArgs.getNodeAccessPoint());

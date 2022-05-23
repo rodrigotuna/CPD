@@ -2,12 +2,13 @@ package server.handler;
 
 import server.Node;
 import server.message.JoinMessage;
+import server.message.MembershipMessage;
 
 import java.io.IOException;
 
 public class JoinHandler implements Runnable{
     private static final int NUM_TRIES = 3;
-    private static final int MAX_LOG_RECEIVED = 3;
+    private static final int LOGS_TO_RECEIVE = 3;
     private final Node node;
     private int logsReceived;
 
@@ -21,19 +22,18 @@ public class JoinHandler implements Runnable{
         try {
             node.StartTCPSocket();
             for(int i = 0; i < NUM_TRIES; i++){
-                node.getMembershipSocket().send(new JoinMessage(node.getAccessPoint(),
-                        node.getMembershipAddress()).getDatagram());
 
-                int tries = 0;
-                while(logsReceived < 3 && tries < 3){
-                    Thread.sleep(1000);
-                    tries++;
-                }
+                node.getMembershipSocket().send(new JoinMessage(node.getHashId(),
+                        node.getMembershipAddress(), 0, node.getAccessPoint()).getDatagram());
 
-                if(logsReceived == MAX_LOG_RECEIVED){
-                    break;
-                }else{
-                    System.out.println("Not enough logs, retrying");
+                while(logsReceived < LOGS_TO_RECEIVE){
+                    MembershipMessage membershipMessage = node.getTcpSocketHandler().getMembershipMessage();
+
+                    if(membershipMessage == null){
+                        break;
+                    }else{
+                        logsReceived++;
+                    }
                 }
             }
             node.StartMembershipSocket();

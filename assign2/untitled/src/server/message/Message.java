@@ -7,7 +7,7 @@ public abstract class Message {
     private final static char CR  = (char) 0x0D;
     private final static char LF  = (char) 0x0A;
 
-    private final static String NL = CR + LF + "\n";
+    private final static String NL = "" + CR + LF;
 
     private final String type;
     private final InetSocketAddress socketAddress;
@@ -23,8 +23,12 @@ public abstract class Message {
     public String getHeader(){
         return type + " " + senderId;
     }
+
+    public String getBody(){
+        return "";
+    }
     public DatagramPacket getDatagram(){
-        byte[] buffer = (getHeader() + NL + NL).getBytes();
+        byte[] buffer = (getHeader() + NL + NL + getBody()).getBytes();
         return new DatagramPacket(buffer,buffer.length, socketAddress);
     }
 

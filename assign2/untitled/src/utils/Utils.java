@@ -30,4 +30,20 @@ public class Utils{
         E upperBound = map.ceiling(value);
         return upperBound == null ? map.first() : upperBound;
     }
+
+    public static int indexOf(byte[] array, byte[] subArray){
+        for(int i = 0; i < array.length; i++){
+            boolean found = true;
+            for(int j =0 ; j < subArray.length; j++){
+                if(array[i+j] != subArray[j]){
+                    found = false;
+                    break;
+                }
+            }
+            if(found){
+                return i;
+            }
+        }
+        return -1;
+    }
 }
