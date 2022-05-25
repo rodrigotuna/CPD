@@ -28,8 +28,6 @@ public class Node implements MembershipInterface {
 
     private final MembershipLog membershipLog;
 
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
-
     private MulticastSocketHandler multicastSocketHandler;
     private TCPSocketHandler tcpSocketHandler;
 
@@ -49,7 +47,7 @@ public class Node implements MembershipInterface {
         registry.bind(getAccessPoint(), stub);
     }
 
-    public void join() throws IOException {
+    public void join(){
         JoinHandler joinHandler = new JoinHandler( this);
         Thread multicastThread = new Thread(joinHandler);
         multicastThread.start();
@@ -99,5 +97,9 @@ public class Node implements MembershipInterface {
 
     public String getHashId(){
         return hashId;
+    }
+
+    public MembershipLog getMembershipLog() {
+        return membershipLog;
     }
 }

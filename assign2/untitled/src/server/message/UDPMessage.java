@@ -35,4 +35,8 @@ public abstract class UDPMessage {
     public String getType() {
         return type;
     }
+
+    public String getSenderId() {
+        return senderId;
+    }
 }

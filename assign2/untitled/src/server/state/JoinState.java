@@ -1,16 +1,16 @@
 package server.state;
 
-import server.message.MembershipMessage;
+import server.message.TCPMembershipMessage;
 
 import java.util.concurrent.Callable;
 
-public class JoinState implements Callable<MembershipMessage> {
+public class JoinState implements Callable<TCPMembershipMessage> {
     private int logsReceived;
-    private MembershipMessage membershipMessage;
+    private TCPMembershipMessage membershipMessage;
 
 
     @Override
-    public MembershipMessage call() throws Exception {
+    public TCPMembershipMessage call() throws Exception {
         return null;
     }
 }

@@ -7,7 +7,7 @@ public abstract class TCPMessage {
     private final static char CR  = (char) 0x0D;
     private final static char LF  = (char) 0x0A;
 
-    private final static String NL = CR + LF + "\n";
+    private final static String NL = "" + CR + LF;
 
     private final String type;
     private final String key;
@@ -20,7 +20,7 @@ public abstract class TCPMessage {
     }
 
     public String getHeader(){
-        return type + key;
+        return type + " " + key;
     }
 
     public byte[] getDataByteStream() throws IOException {
@@ -30,5 +30,9 @@ public abstract class TCPMessage {
         buffer.write(this.value);
 
         return buffer.toByteArray();
+    }
+
+    public String getType() {
+        return type;
     }
 }

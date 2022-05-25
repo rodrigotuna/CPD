@@ -16,7 +16,11 @@ public class JoinMessage extends UDPMessage {
         return super.getHeader() + " " + membershipCounter + " " + accessPoint;
     }
 
+    public int getMembershipCounter(){
+        return membershipCounter;
+    }
 
-
-
+    public String getAccessPoint() {
+        return accessPoint;
+    }
 }
