@@ -2,7 +2,7 @@ package server.message;
 
 import java.net.InetSocketAddress;
 
-public class JoinMessage extends Message{
+public class JoinMessage extends UDPMessage {
     private final int membershipCounter;
     private final String accessPoint;
 

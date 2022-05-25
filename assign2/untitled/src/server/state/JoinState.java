@@ -1,7 +1,6 @@
 package server.state;
 
 import server.message.MembershipMessage;
-import server.message.Message;
 
 import java.util.concurrent.Callable;
 

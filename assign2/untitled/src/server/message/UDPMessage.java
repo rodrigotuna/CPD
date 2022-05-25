@@ -3,7 +3,7 @@ package server.message;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 
-public abstract class Message {
+public abstract class UDPMessage {
     private final static char CR  = (char) 0x0D;
     private final static char LF  = (char) 0x0A;
 
@@ -14,7 +14,7 @@ public abstract class Message {
     private final String senderId;
 
 
-    public Message(String type, String senderId, InetSocketAddress socketAddress) {
+    public UDPMessage(String type, String senderId, InetSocketAddress socketAddress) {
         this.type = type;
         this.socketAddress = socketAddress;
         this.senderId = senderId;

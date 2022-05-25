@@ -31,7 +31,7 @@ public class Client {
         byte[] fileContent = Files.readAllBytes(file.toPath());
         String fileKey = Utils.bytesToHexString(Utils.hash256(fileContent));
 
-        messageStream.write((new PutMessage(fileKey, fileContent)).getDataByteStream());
+        messageStream.write((new PutMessage("PUT", fileKey, fileContent)).getDataByteStream());
         messageStream.flush();
 
         socket.shutdownOutput();

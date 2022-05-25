@@ -2,7 +2,7 @@ package server.handler;
 
 import server.Node;
 import server.message.JoinMessage;
-import server.message.Message;
+import server.message.UDPMessage;
 import server.message.MessageParser;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class MulticastSocketHandler implements Runnable{
             try {
                 membershipSocket.receive(packet);
                 //TODO
-                Message message = messageParser.parse(packet);
+                UDPMessage message = messageParser.parse(packet);
                 switch(message.getType()){
                     case "MEMBERSHIP":
                         break;

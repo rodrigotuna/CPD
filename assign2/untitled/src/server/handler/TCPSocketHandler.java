@@ -2,7 +2,7 @@ package server.handler;
 
 import server.Node;
 import server.message.MembershipMessage;
-import server.message.Message;
+import server.message.UDPMessage;
 import server.message.MessageParser;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class TCPSocketHandler implements Runnable{
             try {
                 Socket socket = nodeSocket.accept();
                 InputStream input = socket.getInputStream();
-                Message message = messageParser.parse(input);
+                UDPMessage message = messageParser.parse(input);
 
                 switch(message.getType()){
                     case "PUT":

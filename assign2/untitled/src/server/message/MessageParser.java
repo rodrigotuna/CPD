@@ -1,17 +1,15 @@
 package server.message;
 
-import server.handler.JoinMessageHandler;
 import utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class MessageParser {
-    public Message parse(DatagramPacket packet){
+    public UDPMessage parse(DatagramPacket packet){
         byte [] data = packet.getData();
         InetSocketAddress socketAddress = (InetSocketAddress) packet.getSocketAddress();
         int headerSize = Utils.indexOf(data, "\r\n\r\n".getBytes());
@@ -30,7 +28,7 @@ public class MessageParser {
         return null;
     }
 
-    public Message parse(InputStream inputStream) throws IOException {
+    public UDPMessage parse(InputStream inputStream) throws IOException {
         byte [] data = inputStream.readAllBytes();
         return null;
     }
