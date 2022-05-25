@@ -4,8 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class PutMessage extends TCPMessage{
-    public PutMessage(String type, String key, String body) {
-        super(type, key);
+    public PutMessage(String key, String body) {
+        super("PUT", key);
         setBody(body);
     }
 }

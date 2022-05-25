@@ -36,7 +36,8 @@ public class MessageParser {
         String senderId = headerFields[1];
         switch(type){
             case "MEMBERSHIP":
-                return new TCPMembershipMessage(senderId, Arrays.copyOfRange(data, headerSize + 4, data.length));
+                return new TCPMembershipMessage(senderId,
+                        Arrays.toString(Arrays.copyOfRange(data, headerSize + 4, data.length)));
             case "PUT":
                 break;
             case "DELETE":

@@ -1,7 +1,7 @@
 package server.message;
 
 public class DeleteMessage extends TCPMessage{
-    public DeleteMessage(String type, String key) {
-        super(type, key);
+    public DeleteMessage(String key) {
+        super("DELETE", key);
     }
 }

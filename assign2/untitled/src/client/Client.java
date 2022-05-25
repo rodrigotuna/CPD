@@ -1,5 +1,6 @@
 package client;
 
+import server.message.DeleteMessage;
 import server.message.GetMessage;
 import server.message.PutMessage;
 import utils.Utils;
@@ -33,7 +34,7 @@ public class Client {
         byte[] fileContent = Files.readAllBytes(file.toPath());
         String fileKey = Utils.bytesToHexString(Utils.hash256(fileContent));
 
-        writer.println((new PutMessage("PUT", fileKey, Arrays.toString(fileContent))).getDataByteStream());
+        writer.println((new PutMessage(fileKey, Arrays.toString(fileContent))).getDataStringStream());
 
         return fileKey;
     }
@@ -43,7 +44,7 @@ public class Client {
         InputStream valueStream = this.socket.getInputStream();
 
         PrintWriter messageWriter = new PrintWriter(messageStream, true);
-        messageWriter.println((new GetMessage("GET", hashcode)).getDataByteStream());
+        messageWriter.println((new GetMessage(hashcode)).getDataStringStream());
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(valueStream));
         StringBuilder fileContent = new StringBuilder();
@@ -61,7 +62,7 @@ public class Client {
         OutputStream messageStream = this.socket.getOutputStream();
 
         PrintWriter messageWriter = new PrintWriter(messageStream, true);
-        messageWriter.println((new GetMessage("DELETE", hashcode)).getDataByteStream());
+        messageWriter.println((new DeleteMessage(hashcode)).getDataStringStream());
 
     }
 }

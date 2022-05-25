@@ -3,7 +3,6 @@ package server.handler;
 import server.Node;
 import server.message.JoinMessage;
 import server.message.TCPMembershipMessage;
-import utils.Utils;
 
 import java.io.IOException;
 
@@ -34,7 +33,7 @@ public class JoinHandler implements Runnable{
                         System.out.println("Not enough messages retrying...\n");
                         break;
                     }else{
-                        System.out.println(new String(membershipMessage.getDataByteStream()));
+                        System.out.println(membershipMessage.getDataStringStream());
                         logsReceived++;
                     }
                 }
