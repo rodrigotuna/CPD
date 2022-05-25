@@ -2,6 +2,8 @@ package server.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 public abstract class TCPMessage {
     private final static char CR  = (char) 0x0D;
@@ -11,24 +13,29 @@ public abstract class TCPMessage {
 
     private final String type;
     private final String key;
-    private final byte[] value;
+    private String body;
 
-    public TCPMessage(String type, String key, byte[] value) {
+    public TCPMessage(String type, String key) {
         this.type = type;
         this.key = key;
-        this.value = value;
+        this.body = null;
     }
 
     public String getHeader(){
         return type + key;
     }
 
-    public byte[] getDataByteStream() throws IOException {
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getDataByteStream() throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         buffer.write((getHeader() + NL + NL ).getBytes());
-        buffer.write(this.value);
+        if(this.body != null) buffer.write(this.body.getBytes());
 
-        return buffer.toByteArray();
+        return buffer.toString();
     }
+
 }
