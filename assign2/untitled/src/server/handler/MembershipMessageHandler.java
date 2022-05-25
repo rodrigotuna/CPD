@@ -1,13 +1,13 @@
 package server.handler;
 
 import server.Node;
-import server.message.MembershipMessage;
+import server.message.TCPMembershipMessage;
 
 public class MembershipMessageHandler implements Runnable{
-    private final MembershipMessage membershipMessage;
+    private final TCPMembershipMessage membershipMessage;
     private final Node node;
 
-    public MembershipMessageHandler(MembershipMessage membershipMessage, Node node){
+    public MembershipMessageHandler(TCPMembershipMessage membershipMessage, Node node){
         this.membershipMessage = membershipMessage;
         this.node = node;
     }

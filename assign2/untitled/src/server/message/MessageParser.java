@@ -28,8 +28,22 @@ public class MessageParser {
         return null;
     }
 
-    public UDPMessage parse(InputStream inputStream) throws IOException {
-        byte [] data = inputStream.readAllBytes();
+    public TCPMessage parse(byte[] data) throws IOException {
+        int headerSize = Utils.indexOf(data, "\r\n\r\n".getBytes());
+        String header = new String(Arrays.copyOfRange(data, 0, headerSize));
+        String [] headerFields =header.split("[ ]+");
+        String type = headerFields[0];
+        String senderId = headerFields[1];
+        switch(type){
+            case "MEMBERSHIP":
+                return new TCPMembershipMessage(senderId, Arrays.copyOfRange(data, headerSize + 4, data.length));
+            case "PUT":
+                break;
+            case "DELETE":
+                break;
+            case "GET":
+                break;
+        }
         return null;
     }
 }

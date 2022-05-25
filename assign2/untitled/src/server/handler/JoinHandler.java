@@ -2,7 +2,8 @@ package server.handler;
 
 import server.Node;
 import server.message.JoinMessage;
-import server.message.MembershipMessage;
+import server.message.TCPMembershipMessage;
+import utils.Utils;
 
 import java.io.IOException;
 
@@ -27,11 +28,13 @@ public class JoinHandler implements Runnable{
                         node.getMembershipAddress(), 0, node.getAccessPoint()).getDatagram());
 
                 while(logsReceived < LOGS_TO_RECEIVE){
-                    MembershipMessage membershipMessage = node.getTcpSocketHandler().getMembershipMessage();
+                    TCPMembershipMessage membershipMessage = node.getTcpSocketHandler().getMembershipMessage();
 
                     if(membershipMessage == null){
+                        System.out.println("Not enough messages retrying...\n");
                         break;
                     }else{
+                        System.out.println(new String(membershipMessage.getDataByteStream()));
                         logsReceived++;
                     }
                 }
