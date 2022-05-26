@@ -20,11 +20,13 @@ public class JoinHandler implements Runnable{
     @Override
     public void run() {
         try {
+            node.getMembershipLog().incrementCounter();
+            int membershipCounter = node.getMembershipLog().getMembershipCounter();
             node.StartTCPSocket();
             for(int i = 0; i < NUM_TRIES; i++){
 
                 node.getMembershipSocket().send(new JoinMessage(node.getHashId(),
-                        node.getMembershipAddress(), 0, node.getAccessPoint()).getDatagram());
+                        node.getMembershipAddress(), membershipCounter, node.getAccessPoint()).getDatagram());
 
                 while(logsReceived < LOGS_TO_RECEIVE){
                     TCPMembershipMessage membershipMessage = node.getTcpSocketHandler().getMembershipMessage();

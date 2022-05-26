@@ -1,19 +1,12 @@
 package server.storage;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class MembershipLog {
     private final String hashId;
     private final File file;
-
-    private List<String> entryList = new ArrayList<>();
     private Map<String, Integer> mostRecent = new TreeMap<>();
     private int membershipCounter;
 
@@ -21,10 +14,7 @@ public class MembershipLog {
         if(mostRecent.containsKey(nodeId) && mostRecent.get(nodeId) >= membershipCounter ){
             return false;
         }
-        FileWriter fileWriter = new FileWriter(file, true);
-        fileWriter.write(nodeId + ";" + membershipCounter + "\n");
-        fileWriter.close();
-        mostRecent.put(nodeId, membershipCounter);
+        updateFileLine(nodeId,membershipCounter);
         return true;
     }
 
@@ -32,13 +22,16 @@ public class MembershipLog {
         this.hashId = hashId;
         file = new File(hashId + ".log");
         if(!file.exists()){
-            FileWriter fileWriter = new FileWriter(file, true);
-            fileWriter.write(-1 + "\n");
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(hashId + ";" + -1 + System.getProperty("line.separator"));
             membershipCounter = -1;
             fileWriter.close();
         }else{
-            FileReader fileReader = new FileReader(file);
-            membershipCounter = fileReader.read();
+            Scanner sc = new Scanner(file);
+            while (sc.hasNext()) {
+                String[] entries = sc.next().split(";");
+                mostRecent.put(entries[0], Integer.parseInt(entries[1]));
+            }
         }
     }
 
@@ -46,8 +39,24 @@ public class MembershipLog {
         return membershipCounter;
     }
 
-    public void incrementCounter() {
+    public void incrementCounter() throws IOException {
         membershipCounter++;
-        //change file line here i think; mas tipo uma só???
+        updateFileLine(hashId, membershipCounter);
+    }
+
+    public void updateFileLine(String nodeId, int membershipCounter) throws IOException {
+        mostRecent.put(nodeId, membershipCounter);
+        Scanner sc = new Scanner(file);
+        StringBuilder content = new StringBuilder();
+        while (sc.hasNext()) {
+            String entry = sc.next();
+            if(!entry.contains(nodeId)) {
+                content.append(entry).append(System.getProperty("line.separator"));
+            }
+        }
+        content.append(nodeId).append(";").append(membershipCounter).append(System.getProperty("line.separator"));
+        FileWriter fw = new FileWriter(file);
+        fw.write(content.toString());
+        fw.close();
     }
 }

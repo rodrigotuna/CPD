@@ -32,7 +32,6 @@ public class TCPSocketHandler implements Runnable{
         while (true) {
             try{
                 socket = nodeSocket.accept();
-                System.out.println(socket);
                 executor.execute(new TCPMessageHandler(socket));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -53,7 +52,6 @@ public class TCPSocketHandler implements Runnable{
             @Override
             public void run() {
                 try{
-                    System.out.println(socket);
                     InputStream input = socket.getInputStream();
                     byte[] data = input.readAllBytes();
                     TCPMessage message = new MessageParser().parse(data);
@@ -65,7 +63,6 @@ public class TCPSocketHandler implements Runnable{
                         case "DELETE":
                             break;
                         case "MEMBERSHIP":
-                            System.out.println("LA PUS HERMANO\n");
                             membershipMessages.put((TCPMembershipMessage) message);
                             break;
                         default:
