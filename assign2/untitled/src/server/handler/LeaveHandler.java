@@ -2,6 +2,7 @@ package server.handler;
 
 import server.Node;
 import server.message.JoinMessage;
+import server.message.LeaveMessage;
 
 import java.io.IOException;
 
@@ -19,8 +20,12 @@ public class LeaveHandler implements Runnable{
             int membershipCounter = node.getMembershipLog().getMembershipCounter();
             node.stopMembershipSocket();
 
-            node.getMembershipSocket().send(new JoinMessage(node.getHashId(),
-                    node.getMembershipAddress(), membershipCounter, node.getAccessPoint()).getDatagram());
+            node.getMembershipSocket().send(new LeaveMessage(node.getHashId(),
+                    node.getMembershipAddress(), membershipCounter).getDatagram());
+
+            //Todo Mandar os ficheiros que tenho a quem devo mandar
+            System.out.println("Vou mandar acabar a thread");
+            node.getTcpSocketHandler().stop();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

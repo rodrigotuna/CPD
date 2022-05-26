@@ -53,8 +53,4 @@ public class MulticastSocketHandler implements Runnable{
             }
         }
     }
-
-    public void stop() {
-        running = false;
-    }
 }

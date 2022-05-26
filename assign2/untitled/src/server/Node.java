@@ -46,6 +46,11 @@ public class Node implements MembershipInterface {
 
         Registry registry = LocateRegistry.getRegistry();
         registry.bind(getAccessPoint(), stub);
+
+        MulticastSocketHandler multicastHandler = new MulticastSocketHandler(membershipSocket, this);
+        this.multicastSocketHandler = multicastHandler;
+        Thread multicastThread = new Thread(multicastHandler);
+        multicastThread.start();
     }
 
     public void join(){
@@ -66,10 +71,6 @@ public class Node implements MembershipInterface {
 
     public void StartMembershipSocket() throws IOException {
         membershipSocket.joinGroup(membershipAddress.getAddress());
-        MulticastSocketHandler multicastHandler = new MulticastSocketHandler(membershipSocket, this);
-        this.multicastSocketHandler = multicastHandler;
-        Thread multicastThread = new Thread(multicastHandler);
-        multicastThread.start();
     }
     public void StartTCPSocket() throws IOException {
         ServerSocket socket = new ServerSocket();
@@ -107,6 +108,5 @@ public class Node implements MembershipInterface {
 
     public void stopMembershipSocket() throws IOException {
         membershipSocket.leaveGroup(membershipAddress.getAddress());
-        this.multicastSocketHandler.stop();
     }
 }

@@ -32,7 +32,7 @@ public class JoinHandler implements Runnable{
                     TCPMembershipMessage membershipMessage = node.getTcpSocketHandler().getMembershipMessage();
 
                     if(membershipMessage == null){
-                        System.out.println("Not enough messages retrying...\n");
+                        System.out.println("Not enough messages retrying...");
                         break;
                     }else{
                         System.out.println(membershipMessage.getDataStringStream());

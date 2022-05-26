@@ -23,20 +23,24 @@ public class TCPSocketHandler implements Runnable{
     public TCPSocketHandler(ServerSocket nodeSocket, Node node){
         this.nodeSocket = nodeSocket;
         this.node = node;
-
     }
 
     @Override
     public void run() {
         Socket socket = null;
-        while (true) {
-            try{
+        try{
+            while (true) {
                 socket = nodeSocket.accept();
                 executor.execute(new TCPMessageHandler(socket));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
         }
+        catch (IOException e) {
+            System.out.println("Thread vai acabar");
+        }
+    }
+
+    public void stop() throws IOException {
+        nodeSocket.close();
     }
 
     TCPMembershipMessage getMembershipMessage() throws InterruptedException {
