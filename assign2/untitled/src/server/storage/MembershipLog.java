@@ -23,7 +23,7 @@ public class MembershipLog {
         file = new File(hashId + ".log");
         if(!file.exists()){
             FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(hashId + ";" + -1 + System.getProperty("line.separator"));
+            fileWriter.write(hashId + ";" + -1 + "\n");
             membershipCounter = -1;
             fileWriter.close();
         }else{

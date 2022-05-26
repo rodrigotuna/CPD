@@ -1,6 +1,7 @@
 package server;
 
 import server.handler.JoinHandler;
+import server.handler.LeaveHandler;
 import server.handler.MulticastSocketHandler;
 import server.handler.TCPSocketHandler;
 import server.state.JoinState;
@@ -49,13 +50,14 @@ public class Node implements MembershipInterface {
 
     public void join(){
         JoinHandler joinHandler = new JoinHandler( this);
-        Thread multicastThread = new Thread(joinHandler);
-        multicastThread.start();
+        Thread joinThread = new Thread(joinHandler);
+        joinThread.start();
     }
 
     public void leave() throws IOException {
-        membershipSocket.leaveGroup(membershipAddress.getAddress());
-
+        LeaveHandler leaveHandler = new LeaveHandler(this);
+        Thread leaveThread = new Thread(leaveHandler);
+        leaveThread.start();
     }
 
     public String getAccessPoint() {
@@ -101,5 +103,10 @@ public class Node implements MembershipInterface {
 
     public MembershipLog getMembershipLog() {
         return membershipLog;
+    }
+
+    public void stopMembershipSocket() throws IOException {
+        membershipSocket.leaveGroup(membershipAddress.getAddress());
+        this.multicastSocketHandler.stop();
     }
 }
