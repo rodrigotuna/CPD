@@ -29,7 +29,8 @@ public class JoinMessageHandler implements Runnable{
                 Socket socket = new Socket(uri.getHost(), uri.getPort());
 
                 OutputStream output = socket.getOutputStream();
-                output.write(new TCPMembershipMessage(node.getHashId(), "OLAMEUAMOR").getDataStringStream().getBytes());
+                output.write(new TCPMembershipMessage(node.getHashId(), node.getMembershipLog().mostRecentLogContent())
+                        .getDataStringStream().getBytes());
                 output.flush(); output.close();
             }
 

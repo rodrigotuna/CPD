@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class MembershipLog {
+    private final static int NUM_LOGS = 32;
     private final String hashId;
     private final File file;
     private Map<String, Integer> mostRecent = new TreeMap<>();
@@ -44,19 +45,63 @@ public class MembershipLog {
         updateFileLine(hashId, membershipCounter);
     }
 
-    public void updateFileLine(String nodeId, int membershipCounter) throws IOException {
+    private void updateFileLine(String nodeId, int membershipCounter) throws IOException {
         mostRecent.put(nodeId, membershipCounter);
+        StringBuilder content = getContentsExcept(nodeId);
+        content.append(nodeId).append(";").append(membershipCounter).append("\n");
+        FileWriter fw = new FileWriter(file);
+        fw.write(content.toString());
+        fw.close();
+    }
+
+    private StringBuilder getContentsExcept(String nodeId) throws FileNotFoundException {
         Scanner sc = new Scanner(file);
         StringBuilder content = new StringBuilder();
         while (sc.hasNext()) {
             String entry = sc.next();
             if(!entry.contains(nodeId)) {
-                content.append(entry).append(System.getProperty("line.separator"));
+                content.append(entry).append("\n");
             }
         }
-        content.append(nodeId).append(";").append(membershipCounter).append(System.getProperty("line.separator"));
+        return content;
+    }
+
+    private ArrayList<String> getContents() throws FileNotFoundException {
+        Scanner sc = new Scanner(file);
+        ArrayList<String> content = new ArrayList<>();
+        while (sc.hasNext()) {
+            String entry = sc.next();
+            content.add(entry);
+        }
+        return content;
+    }
+
+    public void mergeLog(String [] logs, int numLogsReceived) throws IOException {
+        ArrayList<String> logContent =  getContents();
+        for(int i = 0; i < numLogsReceived; i++){
+            String [] entryList = logs[i].split("\n");
+            for(String entry : entryList){
+                String [] entryValues = entry.split(";");
+                if(!mostRecent.containsKey(entryValues[0])){
+                    logContent.add(entry);
+                    mostRecent.put(entryValues[0], Integer.parseInt(entryValues[1]));
+                }else if(mostRecent.get(entryValues[0]) < Integer.parseInt(entryValues[1])){
+                    logContent.remove(entryValues[0] + ";" + mostRecent.get(entryValues[0]));
+                }
+            }
+        }
         FileWriter fw = new FileWriter(file);
-        fw.write(content.toString());
+        for(String s : logContent){
+            fw.write(s + "\n");
+        }
         fw.close();
+    }
+
+    public String mostRecentLogContent() throws FileNotFoundException {
+        ArrayList<String> listContent = getContents();
+        String [] content = new String[listContent.size()];
+        content = listContent.toArray(content);
+
+        return String.join("\n", Arrays.copyOfRange(content, Math.max(0, content.length - 32), content.length));
     }
 }

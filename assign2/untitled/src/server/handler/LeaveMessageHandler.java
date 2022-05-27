@@ -18,7 +18,7 @@ public class LeaveMessageHandler implements Runnable{
     @Override
     public void run() {
         try {
-            node.getMembershipLog().updateFileLine(message.getSenderId(), message.getMembershipCounter());
+            node.getMembershipLog().addEntry(message.getSenderId(), message.getMembershipCounter());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

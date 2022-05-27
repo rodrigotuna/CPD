@@ -27,6 +27,10 @@ public abstract class TCPMessage {
         this.body = body;
     }
 
+    public String getBody(){
+        return body;
+    }
+
     public String getDataStringStream() throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 

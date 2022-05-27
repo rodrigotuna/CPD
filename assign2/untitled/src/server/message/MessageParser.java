@@ -3,7 +3,6 @@ package server.message;
 import utils.Utils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
@@ -37,7 +36,7 @@ public class MessageParser {
         switch(type){
             case "MEMBERSHIP":
                 return new TCPMembershipMessage(senderId,
-                        Arrays.toString(Arrays.copyOfRange(data, headerSize + 4, data.length)));
+                        new String((Arrays.copyOfRange(data, headerSize + 4, data.length))));
             case "PUT":
                 break;
             case "DELETE":
