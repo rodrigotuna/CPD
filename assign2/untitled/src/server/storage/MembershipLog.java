@@ -10,6 +10,7 @@ public class MembershipLog {
     private final File file;
     private Map<String, Integer> mostRecent = new TreeMap<>();
     private int membershipCounter;
+    private String mostRecentlyUpdated;
 
     public boolean addEntry(String nodeId, int membershipCounter) throws IOException {
         if(mostRecent.containsKey(nodeId) && mostRecent.get(nodeId) >= membershipCounter ){
@@ -34,6 +35,7 @@ public class MembershipLog {
                 mostRecent.put(entries[0], Integer.parseInt(entries[1]));
             }
         }
+        mostRecentlyUpdated = hashId;
     }
 
     public int getMembershipCounter() {
@@ -102,6 +104,14 @@ public class MembershipLog {
         String [] content = new String[listContent.size()];
         content = listContent.toArray(content);
 
-        return String.join("\n", Arrays.copyOfRange(content, Math.max(0, content.length - 32), content.length));
+        return String.join("\n", Arrays.copyOfRange(content, Math.max(0, content.length - NUM_LOGS), content.length));
+    }
+
+    public String getMostRecentlyUpdated() {
+        return mostRecentlyUpdated;
+    }
+
+    public void setMostRecentlyUpdated(String mostRecentlyUpdated) {
+        this.mostRecentlyUpdated = mostRecentlyUpdated;
     }
 }

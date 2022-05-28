@@ -36,7 +36,7 @@ public class JoinHandler implements Runnable{
                         System.out.println("Not enough messages retrying...");
                         break;
                     }else{
-                        System.out.println(membershipMessage.getDataStringStream());
+                        System.out.println(node.getHashId() + ":\n" + membershipMessage.getDataStringStream());
                         logsReceived[numLogsReceived++] = membershipMessage.getBody();
                     }
                 }

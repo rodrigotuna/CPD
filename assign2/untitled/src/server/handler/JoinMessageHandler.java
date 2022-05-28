@@ -23,16 +23,20 @@ public class JoinMessageHandler implements Runnable{
     @Override
     public void run() {
         try {
-            if (node.getMembershipLog().addEntry(joinMessage.getSenderId(),
-                                            joinMessage.getMembershipCounter())){
-                URI uri = new URI(null, joinMessage.getAccessPoint(), null, null, null);
-                Socket socket = new Socket(uri.getHost(), uri.getPort());
+            node.getMembershipLog().addEntry(joinMessage.getSenderId(),
+                                            joinMessage.getMembershipCounter());
+                synchronized (node.getMembershipLog().getMostRecentlyUpdated()){
+                    if(!node.getMembershipLog().getMostRecentlyUpdated().equals(joinMessage.getSenderId())){
+                        URI uri = new URI(null, joinMessage.getAccessPoint(), null, null, null);
+                        Socket socket = new Socket(uri.getHost(), uri.getPort());
 
-                OutputStream output = socket.getOutputStream();
-                output.write(new TCPMembershipMessage(node.getHashId(), node.getMembershipLog().mostRecentLogContent())
-                        .getDataStringStream().getBytes());
-                output.flush(); output.close();
-            }
+                        OutputStream output = socket.getOutputStream();
+                        output.write(new TCPMembershipMessage(node.getHashId(), node.getMembershipLog().mostRecentLogContent())
+                                .getDataStringStream().getBytes());
+                        output.flush(); output.close();
+                        node.getMembershipLog().setMostRecentlyUpdated(joinMessage.getSenderId());
+                    }
+                }
 
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);

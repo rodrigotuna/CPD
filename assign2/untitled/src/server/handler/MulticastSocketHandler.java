@@ -37,6 +37,7 @@ public class MulticastSocketHandler implements Runnable{
                 Thread thread = null;
                 switch(message.getType()){
                     case "MEMBERSHIP":
+
                         break;
                     case "JOIN":
                         thread = new Thread(new JoinMessageHandler((JoinMessage) message, node));
