@@ -7,7 +7,7 @@ public abstract class TCPMessage {
     private final static char CR  = (char) 0x0D;
     private final static char LF  = (char) 0x0A;
 
-    private final static String NL = "" + CR + LF;
+    protected final static String NL = "" + CR + LF;
 
     private final String type;
     private final String key;
