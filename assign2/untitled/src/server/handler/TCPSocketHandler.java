@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.concurrent.*;
+
+import static utils.Utils.bytesToHexString;
 
 public class TCPSocketHandler implements Runnable{
 
@@ -27,7 +30,7 @@ public class TCPSocketHandler implements Runnable{
 
     @Override
     public void run() {
-        Socket socket = null;
+        Socket socket;
         try{
             while (true) {
                 socket = nodeSocket.accept();
@@ -46,36 +49,36 @@ public class TCPSocketHandler implements Runnable{
     TCPMembershipMessage getMembershipMessage() throws InterruptedException {
         return membershipMessages.poll(1000, TimeUnit.MILLISECONDS);
     }
-        class TCPMessageHandler implements Runnable{
-            private final Socket socket;
+    class TCPMessageHandler implements Runnable{
+        private final Socket socket;
 
-            private TCPMessageHandler(Socket socket) {
-                this.socket = socket;
-            }
+        private TCPMessageHandler(Socket socket) {
+            this.socket = socket;
+        }
 
-            @Override
-            public void run() {
-                try{
-                    InputStream input = socket.getInputStream();
-                    byte[] data = input.readAllBytes();
-                    TCPMessage message = new MessageParser().parse(data);
-                    switch (message.getType()) {
-                        case "PUT":
-                            break;
-                        case "GET":
-                            break;
-                        case "DELETE":
-                            break;
-                        case "MEMBERSHIP":
-                            membershipMessages.put((TCPMembershipMessage) message);
-                            break;
-                        default:
-                            throw new IllegalStateException("Unexpected value: " + message.getType());
-                    }
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
+        @Override
+        public void run() {
+            try{
+                InputStream input = socket.getInputStream();
+                byte[] data = input.readAllBytes();
+                TCPMessage message = new MessageParser().parse(data);
+                switch (message.getType()) {
+                    case "PUT":
+                        break;
+                    case "GET":
+                        break;
+                    case "DELETE":
+                        break;
+                    case "MEMBERSHIP":
+                        membershipMessages.put((TCPMembershipMessage) message);
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + message.getType());
                 }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
+        }
     }
 
 }

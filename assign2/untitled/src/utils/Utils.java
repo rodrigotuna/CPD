@@ -8,8 +8,13 @@ import java.util.TreeSet;
 
 public class Utils{
 
-    public static byte[] hash256(byte[] content) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    public static byte[] hash256(byte[] content){
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
         return digest.digest(content);
     }
 
@@ -23,6 +28,10 @@ public class Utils{
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    public static String bytesToString(byte[] array) {
+        return new String(array, StandardCharsets.UTF_8);
     }
 
 

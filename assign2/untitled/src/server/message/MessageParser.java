@@ -7,6 +7,9 @@ import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 
+import static utils.Utils.bytesToHexString;
+import static utils.Utils.bytesToString;
+
 public class MessageParser {
     public UDPMessage parse(DatagramPacket packet){
         byte [] data = packet.getData();
@@ -32,13 +35,14 @@ public class MessageParser {
         String header = new String(Arrays.copyOfRange(data, 0, headerSize));
         String [] headerFields =header.split("[ ]+");
         String type = headerFields[0];
-        String senderId = headerFields[1];
+        String key = headerFields[1];
         switch(type){
             case "MEMBERSHIP":
-                return new TCPMembershipMessage(senderId,
-                        new String((Arrays.copyOfRange(data, headerSize + 4, data.length))));
+                return new TCPMembershipMessage(key,
+                        bytesToString(Arrays.copyOfRange(data, headerSize + 4, data.length)));
             case "PUT":
-                break;
+                return new PutMessage(key,
+                        bytesToString((Arrays.copyOfRange(data, headerSize + 4, data.length))));
             case "DELETE":
                 break;
             case "GET":
