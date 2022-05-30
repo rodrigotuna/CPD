@@ -23,8 +23,7 @@ public class LeaveHandler implements Runnable{
             node.getMembershipSocket().send(new LeaveMessage(node.getHashId(),
                     node.getMembershipAddress(), membershipCounter).getDatagram());
 
-            //Todo Mandar os ficheiros que tenho a quem devo mandar
-            System.out.println("Vou mandar acabar a thread");
+            //TODO Mandar os ficheiros que tenho a quem devo mandar
             node.getTcpSocketHandler().stop();
         } catch (IOException e) {
             throw new RuntimeException(e);

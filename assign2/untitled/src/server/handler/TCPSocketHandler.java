@@ -1,6 +1,7 @@
 package server.handler;
 
 import server.Node;
+import server.message.PutMessage;
 import server.message.TCPMembershipMessage;
 import server.message.TCPMessage;
 import server.message.MessageParser;
@@ -36,7 +37,7 @@ public class TCPSocketHandler implements Runnable{
             }
         }
         catch (IOException e) {
-            System.out.println("Thread vai acabar");
+
         }
     }
 
@@ -87,13 +88,25 @@ public class TCPSocketHandler implements Runnable{
         @Override
         public void run() {
             try{
-                InputStream input = socket.getInputStream();
-                byte[] data = input.readAllBytes();
+                InputStream inputStream = socket.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                InputStreamReader ir = new InputStreamReader(inputStream);
+                byte[] data = new byte[1024];
+                inputStream.read(data);
                 TCPMessage message = new MessageParser().parse(data);
+                System.out.println(message.getType());
+                OutputStream outputStream = socket.getOutputStream();
+                PrintWriter pw = new PrintWriter(outputStream, true);
                 switch (message.getType()) {
                     case "PUT":
-                        putValue(node.getAccessPoint(),message.getKey(),message.getBody());
-                        // SEND OK MESSAGE?
+                        String responsibleAccessPoint = node.getRing().getResponsible(message.getKey());
+                        if(responsibleAccessPoint.equals(node.getAccessPoint())){
+                            putValue(node.getAccessPoint(),message.getKey(),message.getBody());
+                            pw.println(200);
+                        }else{
+                            pw.println(300);
+                            pw.println(responsibleAccessPoint);
+                        }
                         break;
                     case "GET":
                         break;
@@ -107,6 +120,7 @@ public class TCPSocketHandler implements Runnable{
                     default:
                         throw new IllegalStateException("Unexpected value: " + message.getType());
                 }
+                System.out.println("Me voy voy voy");
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
