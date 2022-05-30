@@ -18,7 +18,7 @@ public class MembershipMessageHandler implements Runnable{
     @Override
     public void run() {
         try {
-            node.getMembershipLog().mergeLog(new String[]{membershipMessage.getBody()}, 1);
+            node.getMembershipLog().mergeLog(membershipMessage.getBody());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

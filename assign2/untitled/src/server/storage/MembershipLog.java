@@ -78,18 +78,16 @@ public class MembershipLog {
         return content;
     }
 
-    public void mergeLog(String [] logs, int numLogsReceived) throws IOException {
+    public void mergeLog(String log) throws IOException {
         ArrayList<String> logContent =  getContents();
-        for(int i = 0; i < numLogsReceived; i++){
-            String [] entryList = logs[i].split("\n");
-            for(String entry : entryList){
-                String [] entryValues = entry.split(";");
-                if(!mostRecent.containsKey(entryValues[0])){
-                    logContent.add(entry);
-                    mostRecent.put(entryValues[0], Integer.parseInt(entryValues[1]));
-                }else if(mostRecent.get(entryValues[0]) < Integer.parseInt(entryValues[1])){
-                    logContent.remove(entryValues[0] + ";" + mostRecent.get(entryValues[0]));
-                }
+        String [] entryList = log.split("\n");
+        for(String entry : entryList) {
+            String[] entryValues = entry.split(";");
+            if (!mostRecent.containsKey(entryValues[0])) {
+                logContent.add(entry);
+                mostRecent.put(entryValues[0], Integer.parseInt(entryValues[1]));
+            } else if (mostRecent.get(entryValues[0]) < Integer.parseInt(entryValues[1])) {
+                logContent.remove(entryValues[0] + ";" + mostRecent.get(entryValues[0]));
             }
         }
         FileWriter fw = new FileWriter(file);

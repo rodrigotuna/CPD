@@ -25,19 +25,20 @@ public class JoinMessageHandler implements Runnable{
         try {
             node.getMembershipLog().addEntry(joinMessage.getSenderId(),
                                             joinMessage.getMembershipCounter());
-                synchronized (node.getMembershipLog().getMostRecentlyUpdated()){
-                    if(!node.getMembershipLog().getMostRecentlyUpdated().equals(joinMessage.getSenderId())){
-                        URI uri = new URI(null, joinMessage.getAccessPoint(), null, null, null);
-                        Socket socket = new Socket(uri.getHost(), uri.getPort());
+            node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
+            synchronized (node.getMembershipLog().getMostRecentlyUpdated()){
+                if(!node.getMembershipLog().getMostRecentlyUpdated().equals(joinMessage.getSenderId())){
+                    URI uri = new URI(null, joinMessage.getAccessPoint(), null, null, null);
+                    Socket socket = new Socket(uri.getHost(), uri.getPort());
 
-                        OutputStream output = socket.getOutputStream();
-                        output.write(new TCPMembershipMessage(node.getHashId(), node.getMembershipLog().mostRecentLogContent())
-                                .getDataStringStream().getBytes());
-                        output.flush(); output.close();
-                        node.getMembershipLog().setMostRecentlyUpdated(joinMessage.getSenderId());
-                    }
+                    OutputStream output = socket.getOutputStream();
+                    output.write(new TCPMembershipMessage(node.getHashId(),
+                            node.getMembershipLog().mostRecentLogContent(), node.getRing().listMembers())
+                            .getDataStringStream().getBytes());
+                    output.flush(); output.close();
+                    node.getMembershipLog().setMostRecentlyUpdated(joinMessage.getSenderId());
                 }
-
+            }
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }

@@ -1,8 +1,10 @@
 package server.handler;
 
+import jdk.jshell.execution.Util;
 import server.Node;
 import server.message.JoinMessage;
 import server.message.TCPMembershipMessage;
+import utils.Utils;
 
 import java.io.IOException;
 
@@ -24,6 +26,7 @@ public class JoinHandler implements Runnable{
         try {
             node.getMembershipLog().incrementCounter();
             int membershipCounter = node.getMembershipLog().getMembershipCounter();
+            node.getRing().addMember(node.getHashId(), node.getAccessPoint());
             node.StartTCPSocket();
             for(int i = 0; i < NUM_TRIES; i++){
                 node.getMembershipSocket().send(new JoinMessage(node.getHashId(),
@@ -42,7 +45,11 @@ public class JoinHandler implements Runnable{
                 }
             }
             node.StartMembershipSocket();
-            node.getMembershipLog().mergeLog(logsReceived, numLogsReceived);
+            for(int i = 0; i < numLogsReceived; i++){
+                int index = Utils.indexOf(logsReceived[i].getBytes(), "\r\n".getBytes());
+                node.getMembershipLog().mergeLog(logsReceived[i].substring(0,index));
+                node.getRing().mergeRing(logsReceived[i].substring(index+2));
+            }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

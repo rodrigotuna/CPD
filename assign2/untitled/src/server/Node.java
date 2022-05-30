@@ -6,6 +6,7 @@ import server.handler.MulticastSocketHandler;
 import server.handler.TCPSocketHandler;
 import server.state.JoinState;
 import server.storage.MembershipLog;
+import server.storage.Ring;
 import utils.Utils;
 
 import java.io.IOException;
@@ -28,8 +29,9 @@ public class Node implements MembershipInterface {
     private final InetSocketAddress accessPoint;
 
     private final MembershipLog membershipLog;
+    private final Ring ring;
 
-    private MulticastSocketHandler multicastSocketHandler;
+    private final MulticastSocketHandler multicastSocketHandler;
     private TCPSocketHandler tcpSocketHandler;
 
     public Node(InetSocketAddress membershipAddress, InetSocketAddress accessPoint) throws IOException, AlreadyBoundException, NoSuchAlgorithmException {
@@ -41,6 +43,7 @@ public class Node implements MembershipInterface {
         this.hashId = Utils.bytesToHexString(Utils.hash256(getAccessPoint().getBytes()));
 
         this.membershipLog = new MembershipLog(hashId);
+        this.ring = new Ring();
 
         MembershipInterface stub = (MembershipInterface) UnicastRemoteObject.exportObject(this, 0);
 
@@ -108,5 +111,9 @@ public class Node implements MembershipInterface {
 
     public void stopMembershipSocket() throws IOException {
         membershipSocket.leaveGroup(membershipAddress.getAddress());
+    }
+
+    public Ring getRing() {
+        return ring;
     }
 }
