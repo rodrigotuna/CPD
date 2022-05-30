@@ -19,6 +19,7 @@ public class LeaveMessageHandler implements Runnable{
     public void run() {
         try {
             node.getMembershipLog().addEntry(message.getSenderId(), message.getMembershipCounter());
+            node.getRing().removeMember(message.getSenderId());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

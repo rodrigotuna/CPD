@@ -36,8 +36,21 @@ public class Client {
 
             byte[] fileContent = Files.readAllBytes(file.toPath());
             String fileKey = Utils.bytesToHexString(Utils.hash256(fileContent));
-
             writer.println((new PutMessage(fileKey, bytesToString(fileContent))).getDataStringStream());
+
+            System.out.println("Sent file, waiting for response");
+
+            InputStream inputStream = this.socket.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String code = bufferedReader.readLine();
+            System.out.println(code);
+            switch(Integer.parseInt(code)){
+                case 400:
+                    System.out.println("200 OK: Successful Operation");
+                case 300:
+                    System.out.println("300 : Redirect");
+            }
+
 
             return fileKey;
         }

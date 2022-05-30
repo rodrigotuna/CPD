@@ -30,7 +30,7 @@ public class Ring {
     }
 
     public String getResponsible(String fileId){
-        return ring.get(Utils.circularUpperBound((TreeSet) ring.keySet(), fileId));
+        return ring.get(Utils.circularUpperBound(ring, fileId));
     }
 
     public void mergeRing(String ring) {
