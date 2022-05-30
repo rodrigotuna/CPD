@@ -4,15 +4,12 @@ import server.Node;
 import server.message.TCPMembershipMessage;
 import server.message.TCPMessage;
 import server.message.MessageParser;
+import utils.Utils;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.concurrent.*;
-
-import static utils.Utils.bytesToHexString;
 
 public class TCPSocketHandler implements Runnable{
 
@@ -49,6 +46,32 @@ public class TCPSocketHandler implements Runnable{
     TCPMembershipMessage getMembershipMessage() throws InterruptedException {
         return membershipMessages.poll(1000, TimeUnit.MILLISECONDS);
     }
+
+    public void putValue(String nodeAccessPoint, String key, String fileContent) {
+        try {
+            File file = new File("filesystem/" + nodeAccessPoint + "/" + key + ".file");
+            if (!file.getParentFile().isDirectory()) file.getParentFile().mkdirs();
+
+            FileWriter valueWriter = new FileWriter(file);
+            valueWriter.write(fileContent);
+
+            valueWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteValue(String nodeAccessPoint, String key) {
+        try {
+            File file = new File("filesystem/" + nodeAccessPoint + "/" + key + ".file");
+            if (!file.exists()) throw new FileNotFoundException();
+
+            if(!file.delete()) throw new IOException();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     class TCPMessageHandler implements Runnable{
         private final Socket socket;
 
@@ -62,12 +85,17 @@ public class TCPSocketHandler implements Runnable{
                 InputStream input = socket.getInputStream();
                 byte[] data = input.readAllBytes();
                 TCPMessage message = new MessageParser().parse(data);
+                System.out.println(message.getType());
                 switch (message.getType()) {
                     case "PUT":
+                        putValue(node.getAccessPoint(),message.getKey(),message.getBody());
+                        // SEND OK MESSAGE?
                         break;
                     case "GET":
                         break;
                     case "DELETE":
+                        //deleteValue(node.getAccessPoint(), message.getKey());
+                        // SEND OK MESSAGE?
                         break;
                     case "MEMBERSHIP":
                         membershipMessages.put((TCPMembershipMessage) message);

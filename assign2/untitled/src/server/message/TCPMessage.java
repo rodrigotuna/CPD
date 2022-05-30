@@ -31,6 +31,8 @@ public abstract class TCPMessage {
         return body;
     }
 
+    public String getKey(){return key;}
+
     public String getDataStringStream() throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 

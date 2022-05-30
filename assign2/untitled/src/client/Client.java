@@ -46,7 +46,6 @@ public class Client {
         }
     }
 
-    //TODO TEST
     public void get(String hashcode){
         try {
             OutputStream messageStream = this.socket.getOutputStream();
@@ -71,7 +70,6 @@ public class Client {
         }
     }
 
-    //TODO TEST
     public void delete(String hashcode) {
         try{
             OutputStream messageStream = this.socket.getOutputStream();
