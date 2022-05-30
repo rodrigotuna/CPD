@@ -9,6 +9,7 @@ import utils.Utils;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 public class TCPSocketHandler implements Runnable{
@@ -68,6 +69,10 @@ public class TCPSocketHandler implements Runnable{
 
             if(!file.delete()) throw new IOException();
 
+            // IS IT NECESSARY TO DELETE NODE FOLDER?
+            if(file.getParentFile().isDirectory() && Objects.requireNonNull(file.getParentFile().list()).length == 0)
+                if(!file.getParentFile().delete()) throw new IOException();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -85,7 +90,6 @@ public class TCPSocketHandler implements Runnable{
                 InputStream input = socket.getInputStream();
                 byte[] data = input.readAllBytes();
                 TCPMessage message = new MessageParser().parse(data);
-                System.out.println(message.getType());
                 switch (message.getType()) {
                     case "PUT":
                         putValue(node.getAccessPoint(),message.getKey(),message.getBody());
@@ -94,7 +98,7 @@ public class TCPSocketHandler implements Runnable{
                     case "GET":
                         break;
                     case "DELETE":
-                        //deleteValue(node.getAccessPoint(), message.getKey());
+                        deleteValue(node.getAccessPoint(), message.getKey());
                         // SEND OK MESSAGE?
                         break;
                     case "MEMBERSHIP":

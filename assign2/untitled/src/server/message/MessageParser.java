@@ -44,7 +44,7 @@ public class MessageParser {
                 return new PutMessage(key,
                         bytesToString((Arrays.copyOfRange(data, headerSize + 4, data.length))));
             case "DELETE":
-                break;
+                return new DeleteMessage(key);
             case "GET":
                 break;
         }
