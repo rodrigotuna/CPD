@@ -18,7 +18,7 @@ public class TCPSocketHandler implements Runnable{
     private final ServerSocket nodeSocket;
     private final Node node;
 
-    private final BlockingQueue<TCPMembershipMessage> membershipMessages = new LinkedBlockingQueue<>();
+    private final BlockingQueue<byte []> membershipMessages = new LinkedBlockingQueue<>();
 
     private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
@@ -29,11 +29,9 @@ public class TCPSocketHandler implements Runnable{
 
     @Override
     public void run() {
-        Socket socket;
         try{
             while (true) {
-                socket = nodeSocket.accept();
-                executor.execute(new TCPMessageHandler(socket));
+                executor.execute(new TCPMessageHandler(nodeSocket.accept()));
             }
         }
         catch (IOException e) {
@@ -45,7 +43,7 @@ public class TCPSocketHandler implements Runnable{
         nodeSocket.close();
     }
 
-    TCPMembershipMessage getMembershipMessage() throws InterruptedException {
+    byte [] getMembershipMessage() throws InterruptedException {
         return membershipMessages.poll(1000, TimeUnit.MILLISECONDS);
     }
 
@@ -90,19 +88,20 @@ public class TCPSocketHandler implements Runnable{
             try{
                 InputStream inputStream = socket.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                InputStreamReader ir = new InputStreamReader(inputStream);
-                byte[] data = new byte[1024];
-                inputStream.read(data);
-                TCPMessage message = new MessageParser().parse(data);
-                System.out.println(message.getType());
+                String header = bufferedReader.readLine();
+                System.out.println(header);
+                System.out.println(inputStream);
+                TCPMessage message = new MessageParser().parseHeader(header);
+
                 OutputStream outputStream = socket.getOutputStream();
                 PrintWriter pw = new PrintWriter(outputStream, true);
                 switch (message.getType()) {
                     case "PUT":
                         String responsibleAccessPoint = node.getRing().getResponsible(message.getKey());
                         if(responsibleAccessPoint.equals(node.getAccessPoint())){
-                            putValue(node.getAccessPoint(),message.getKey(),message.getBody());
                             pw.println(200);
+                            byte [] data = inputStream.readAllBytes();
+                            putValue(node.getAccessPoint(), message.getKey(), new String(data));
                         }else{
                             pw.println(300);
                             pw.println(responsibleAccessPoint);
@@ -115,7 +114,10 @@ public class TCPSocketHandler implements Runnable{
                         // SEND OK MESSAGE?
                         break;
                     case "MEMBERSHIP":
-                        membershipMessages.put((TCPMembershipMessage) message);
+                        System.out.println(inputStream);
+                        byte[] data = inputStream.readAllBytes();
+                        System.out.println("TO queue:\n" + new String(data));
+                        membershipMessages.put(data);
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + message.getType());

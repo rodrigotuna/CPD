@@ -1,9 +1,6 @@
 package server;
 
-import server.handler.JoinHandler;
-import server.handler.LeaveHandler;
-import server.handler.MulticastSocketHandler;
-import server.handler.TCPSocketHandler;
+import server.handler.*;
 import server.state.JoinState;
 import server.storage.MembershipLog;
 import server.storage.Ring;
@@ -33,6 +30,8 @@ public class Node implements MembershipInterface {
 
     private final MulticastSocketHandler multicastSocketHandler;
     private TCPSocketHandler tcpSocketHandler;
+
+    private TCPMembershipSocketHandler tcpMembershipSocketHandler;
 
     public Node(InetSocketAddress membershipAddress, InetSocketAddress accessPoint) throws IOException, AlreadyBoundException, NoSuchAlgorithmException {
 
@@ -75,6 +74,17 @@ public class Node implements MembershipInterface {
     public void StartMembershipSocket() throws IOException {
         membershipSocket.joinGroup(membershipAddress.getAddress());
     }
+
+    public void StartTCPMembershipSocket() throws IOException, URISyntaxException {
+        ServerSocket socket = new ServerSocket();
+        URI uri = new URI(null, getAccessPoint(), null, null, null);
+        socket.bind(new InetSocketAddress(uri.getHost(), 8888));
+        TCPMembershipSocketHandler tcpHandler = new TCPMembershipSocketHandler(socket, this);
+        this.tcpMembershipSocketHandler = tcpHandler;
+        Thread tcpThread = new Thread(tcpHandler);
+        tcpThread.start();
+        // TODO thread pool
+    }
     public void StartTCPSocket() throws IOException {
         ServerSocket socket = new ServerSocket();
         socket.bind(accessPoint);
@@ -99,6 +109,10 @@ public class Node implements MembershipInterface {
 
     public TCPSocketHandler getTcpSocketHandler() {
         return tcpSocketHandler;
+    }
+
+    public TCPMembershipSocketHandler getTcpMembershipSocketHandler() {
+        return tcpMembershipSocketHandler;
     }
 
     public String getHashId(){

@@ -4,14 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public abstract class TCPMessage {
-    private final static char CR  = (char) 0x0D;
-    private final static char LF  = (char) 0x0A;
-
-    protected final static String NL = "" + CR + LF;
 
     private final String type;
     private final String key;
-    private String body;
+    protected String body;
 
     public TCPMessage(String type, String key) {
         this.type = type;
@@ -36,7 +32,7 @@ public abstract class TCPMessage {
     public String getDataStringStream() throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-        buffer.write((getHeader() + NL + NL ).getBytes());
+        buffer.write((getHeader() + "\n" ).getBytes());
         if(this.body != null) buffer.write(this.body.getBytes());
 
         return buffer.toString();

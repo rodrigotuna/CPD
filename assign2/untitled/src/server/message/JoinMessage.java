@@ -13,7 +13,7 @@ public class JoinMessage extends UDPMessage {
     }
 
     public String getHeader(){
-        return super.getHeader() + " " + membershipCounter + " " + accessPoint;
+        return super.getHeader() + " " + membershipCounter + " " + accessPoint + " " + 8888;
     }
 
     public int getMembershipCounter(){

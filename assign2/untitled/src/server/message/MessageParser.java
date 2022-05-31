@@ -30,6 +30,22 @@ public class MessageParser {
         return null;
     }
 
+    public TCPMessage parseHeader(String header){
+        String [] headerFields = header.split("[ ]+");
+        String type = headerFields[0];
+        String key = headerFields[1];
+        switch(type){
+            case "MEMBERSHIP":
+                return new TCPMembershipMessage(key);
+            case "PUT":
+                return new PutMessage(key);
+            case "DELETE":
+                return new DeleteMessage(key);
+            case "GET":
+                break;
+        }
+        return null;
+    }
     public TCPMessage parse(byte[] data) throws IOException {
         int headerSize = Utils.indexOf(data, "\r\n\r\n".getBytes());
         String header = new String(Arrays.copyOfRange(data, 0, headerSize));

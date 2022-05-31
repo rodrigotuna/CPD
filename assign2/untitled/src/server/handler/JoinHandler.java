@@ -7,6 +7,7 @@ import server.message.TCPMembershipMessage;
 import utils.Utils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class JoinHandler implements Runnable{
     private static final int NUM_TRIES = 3;
@@ -27,13 +28,13 @@ public class JoinHandler implements Runnable{
             node.getMembershipLog().incrementCounter();
             int membershipCounter = node.getMembershipLog().getMembershipCounter();
             node.getRing().addMember(node.getHashId(), node.getAccessPoint());
-            node.StartTCPSocket();
+            node.StartTCPMembershipSocket();
             for(int i = 0; i < NUM_TRIES; i++){
                 node.getMembershipSocket().send(new JoinMessage(node.getHashId(),
                         node.getMembershipAddress(), membershipCounter, node.getAccessPoint()).getDatagram());
 
                 while(numLogsReceived< LOGS_TO_RECEIVE){
-                    TCPMembershipMessage membershipMessage = node.getTcpSocketHandler().getMembershipMessage();
+                    TCPMembershipMessage membershipMessage = node.getTcpMembershipSocketHandler().getMembershipMessage();
 
                     if(membershipMessage == null){
                         System.out.println("Not enough messages retrying...");
@@ -44,13 +45,15 @@ public class JoinHandler implements Runnable{
                     }
                 }
             }
-            node.StartMembershipSocket();
+            node.getTcpMembershipSocketHandler().stop();
             for(int i = 0; i < numLogsReceived; i++){
                 int index = Utils.indexOf(logsReceived[i].getBytes(), "\r\n".getBytes());
                 node.getMembershipLog().mergeLog(logsReceived[i].substring(0,index));
                 node.getRing().mergeRing(logsReceived[i].substring(index+2));
             }
-        } catch (IOException | InterruptedException e) {
+            node.StartMembershipSocket();
+            node.StartTCPSocket();
+        } catch (IOException | InterruptedException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

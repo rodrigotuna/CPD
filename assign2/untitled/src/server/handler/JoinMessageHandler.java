@@ -24,12 +24,12 @@ public class JoinMessageHandler implements Runnable{
     public void run() {
         try {
             node.getMembershipLog().addEntry(joinMessage.getSenderId(),
-                                            joinMessage.getMembershipCounter());
+                    joinMessage.getMembershipCounter());
             node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
             synchronized (node.getMembershipLog().getMostRecentlyUpdated()){
                 if(!node.getMembershipLog().getMostRecentlyUpdated().equals(joinMessage.getSenderId())){
                     URI uri = new URI(null, joinMessage.getAccessPoint(), null, null, null);
-                    Socket socket = new Socket(uri.getHost(), uri.getPort());
+                    Socket socket = new Socket(uri.getHost(), 8888);
 
                     OutputStream output = socket.getOutputStream();
                     output.write(new TCPMembershipMessage(node.getHashId(),

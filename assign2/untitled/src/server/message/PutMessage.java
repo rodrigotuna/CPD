@@ -8,4 +8,7 @@ public class PutMessage extends TCPMessage{
         super("PUT", key);
         setBody(body);
     }
+    public PutMessage(String key) {
+        super("PUT", key);
+    }
 }
