@@ -2,10 +2,12 @@ package server;
 
 import server.handler.*;
 import server.state.JoinState;
+import server.storage.FileSystem;
 import server.storage.MembershipLog;
 import server.storage.Ring;
 import utils.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
@@ -28,6 +30,8 @@ public class Node implements MembershipInterface {
     private final MembershipLog membershipLog;
     private final Ring ring;
 
+    private final FileSystem fileSystem;
+
     private final MulticastSocketHandler multicastSocketHandler;
     private TCPSocketHandler tcpSocketHandler;
 
@@ -43,6 +47,7 @@ public class Node implements MembershipInterface {
 
         this.membershipLog = new MembershipLog(getAccessPoint());
         this.ring = new Ring();
+        this.fileSystem = new FileSystem(getAccessPoint());
 
         MembershipInterface stub = (MembershipInterface) UnicastRemoteObject.exportObject(this, 0);
 
@@ -129,5 +134,10 @@ public class Node implements MembershipInterface {
 
     public Ring getRing() {
         return ring;
+    }
+
+
+    public FileSystem getFileSystem() {
+        return fileSystem;
     }
 }

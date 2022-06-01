@@ -102,7 +102,7 @@ public class TCPSocketHandler implements Runnable{
                         if(responsibleAccessPoint.equals(node.getAccessPoint())){
                             pw.println(200);
                             byte [] data = inputStream.readAllBytes();
-                            putValue(node.getAccessPoint(), message.getKey(), new String(data));
+                            node.getFileSystem().put(message.getKey(), new String(data));
                         }else{
                             pw.println(300);
                             pw.println(responsibleAccessPoint);
@@ -113,7 +113,7 @@ public class TCPSocketHandler implements Runnable{
                     case "DELETE":
                         if(responsibleAccessPoint.equals(node.getAccessPoint())){
                             pw.println(200);
-                            deleteValue(node.getAccessPoint(), message.getKey());
+                            node.getFileSystem().delete(message.getKey());
                         }else{
                             pw.println(300);
                             pw.println(responsibleAccessPoint);

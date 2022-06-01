@@ -39,6 +39,10 @@ public class JoinMessageHandler implements Runnable{
                     node.getMembershipLog().setMostRecentlyUpdated(joinMessage.getSenderId());
                 }
             }
+
+            if(node.getRing().getResponsible(joinMessage.getSenderId()).equals(node.getAccessPoint())){
+
+            }
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
