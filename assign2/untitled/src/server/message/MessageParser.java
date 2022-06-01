@@ -42,7 +42,7 @@ public class MessageParser {
             case "DELETE":
                 return new DeleteMessage(key);
             case "GET":
-                break;
+                return new GetMessage(key);
         }
         return null;
     }
@@ -62,7 +62,7 @@ public class MessageParser {
             case "DELETE":
                 return new DeleteMessage(key);
             case "GET":
-                break;
+                return new GetMessage(key);
         }
         return null;
     }

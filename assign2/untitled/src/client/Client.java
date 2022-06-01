@@ -10,11 +10,6 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-
-import static utils.Utils.bytesToString;
-
 
 public class Client {
 
@@ -65,23 +60,35 @@ public class Client {
     public void get(String hashcode){
         try {
             OutputStream messageStream = this.socket.getOutputStream();
-            InputStream valueStream = this.socket.getInputStream();
 
             PrintWriter messageWriter = new PrintWriter(messageStream, true);
             messageWriter.println((new GetMessage(hashcode)).getDataStringStream());
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(valueStream));
-            StringBuilder fileContent = new StringBuilder();
-            while (this.socket.isConnected())
-                fileContent.append(reader.readLine());
+            InputStream inputStream = this.socket.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String code = bufferedReader.readLine();
+            System.out.println(code);
+            switch(Integer.parseInt(code)){
+                case 200:
 
-            File file = new File("../FileSystem" + this.nodeAccessPoint + "/" + hashcode + ".file");
-            if (!file.getParentFile().isDirectory()) file.getParentFile().mkdirs();
+                    byte[] fileContent = inputStream.readAllBytes();
 
-            FileWriter valueWriter = new FileWriter(file);
-            if (file.createNewFile()) valueWriter.write(fileContent.toString());
+                    File file = new File(hashcode);
+                    FileWriter valueWriter = new FileWriter(file);
+                    file.createNewFile();
+
+                    valueWriter.write(Utils.bytesToString(fileContent));
+                    valueWriter.close();
+
+                    System.out.println("200: OK Successful Operation");
+                    break;
+                case 300:
+                    System.out.println("300: Redirect");
+                    String accessPoint = bufferedReader.readLine();
+                    new Client(accessPoint).get(hashcode);
+            }
         }
-        catch (IOException e) {
+        catch (IOException | URISyntaxException e){
             throw new RuntimeException(e);
         }
     }

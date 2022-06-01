@@ -45,35 +45,6 @@ public class TCPSocketHandler implements Runnable{
         return membershipMessages.poll(1000, TimeUnit.MILLISECONDS);
     }
 
-    public void putValue(String nodeAccessPoint, String key, String fileContent) {
-        try {
-            File file = new File("filesystem/" + nodeAccessPoint + "/" + key + ".file");
-            if (!file.getParentFile().isDirectory()) file.getParentFile().mkdirs();
-
-            FileWriter valueWriter = new FileWriter(file);
-            valueWriter.write(fileContent);
-
-            valueWriter.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void deleteValue(String nodeAccessPoint, String key) {
-        try {
-            File file = new File("filesystem/" + nodeAccessPoint + "/" + key + ".file");
-            if (!file.exists()) throw new FileNotFoundException();
-
-            if(!file.delete()) throw new IOException();
-
-            // IS IT NECESSARY TO DELETE NODE FOLDER?
-            if(file.getParentFile().isDirectory() && Objects.requireNonNull(file.getParentFile().list()).length == 0)
-                if(!file.getParentFile().delete()) throw new IOException();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
     class TCPMessageHandler implements Runnable{
         private final Socket socket;
 
@@ -107,6 +78,15 @@ public class TCPSocketHandler implements Runnable{
                         }
                         break;
                     case "GET":
+                        if(responsibleAccessPoint.equals(node.getAccessPoint())){
+                            pw.println(200);
+                            pw.println(node.getFileSystem().get(message.getKey()));
+                            pw.flush();
+                            socket.close();
+                        }else{
+                            pw.println(300);
+                            pw.println(responsibleAccessPoint);
+                        }
                         break;
                     case "DELETE":
                         if(responsibleAccessPoint.equals(node.getAccessPoint())){
@@ -116,7 +96,6 @@ public class TCPSocketHandler implements Runnable{
                             pw.println(300);
                             pw.println(responsibleAccessPoint);
                         }
-                        // SEND OK MESSAGE?
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + message.getType());

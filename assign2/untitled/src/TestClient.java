@@ -38,6 +38,7 @@ public class TestClient {
                         break;
                     case "get":
                         client.get(functionArgs.getHashcode());
+                        break;
                     case "delete":
                         client.delete(functionArgs.getHashcode());
                 }

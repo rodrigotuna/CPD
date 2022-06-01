@@ -1,9 +1,12 @@
 package server.storage;
 
+import utils.Utils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +30,6 @@ public class FileSystem {
     public void put(String key, String fileContent){
         try {
             File file = new File(path + key);
-            System.out.println(fileContent);
             if (!file.getParentFile().isDirectory()) file.getParentFile().mkdirs();
 
             FileWriter valueWriter = new FileWriter(file);
@@ -43,11 +45,21 @@ public class FileSystem {
         try {
             File file = new File(path + key);
             if (!file.exists()) throw new FileNotFoundException();
-
             if(!file.delete()) throw new IOException();
 
-            if(file.getParentFile().isDirectory() && Objects.requireNonNull(file.getParentFile().list()).length == 0)
-                if(!file.getParentFile().delete()) throw new IOException();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String get(String key) {
+        try {
+            File file = new File(path + key);
+            if (!file.exists()) throw new FileNotFoundException();
+
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+
+            return Utils.bytesToString(fileContent);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
