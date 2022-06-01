@@ -12,11 +12,15 @@ public class MembershipLog {
     private int membershipCounter;
     private String mostRecentlyUpdated;
 
+    private int score;
+
     public boolean addEntry(String nodeId, int membershipCounter) throws IOException {
         if(mostRecent.containsKey(nodeId) && mostRecent.get(nodeId) >= membershipCounter ){
             return false;
         }
+        if (mostRecent.containsKey(nodeId)) score -= mostRecent.get(nodeId);
         updateFileLine(nodeId,membershipCounter);
+        score += mostRecent.get(nodeId);
         return true;
     }
 
@@ -27,12 +31,15 @@ public class MembershipLog {
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(hashId + ";" + -1 + "\n");
             membershipCounter = -1;
+            this.score = -1;
             fileWriter.close();
         }else{
             Scanner sc = new Scanner(file);
+            this.score = 0;
             while (sc.hasNext()) {
                 String[] entries = sc.next().split(";");
                 mostRecent.put(entries[0], Integer.parseInt(entries[1]));
+                score += Integer.parseInt(entries[1]);
             }
         }
         mostRecentlyUpdated = hashId;
@@ -44,6 +51,7 @@ public class MembershipLog {
 
     public void incrementCounter() throws IOException {
         membershipCounter++;
+        score++;
         updateFileLine(hashId, membershipCounter);
     }
 
@@ -111,5 +119,9 @@ public class MembershipLog {
 
     public void setMostRecentlyUpdated(String mostRecentlyUpdated) {
         this.mostRecentlyUpdated = mostRecentlyUpdated;
+    }
+
+    public int getScore() {
+        return score;
     }
 }

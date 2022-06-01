@@ -30,6 +30,7 @@ public class JoinMessageHandler implements Runnable{
             synchronized (node.getMembershipLog().getMostRecentlyUpdated()){
                 if(!node.getMembershipLog().getMostRecentlyUpdated().equals(joinMessage.getSenderId())){
                     URI uri = new URI(null, joinMessage.getAccessPoint(), null, null, null);
+                    Thread.sleep(500/(node.getMembershipLog().getScore() + 1));
                     Socket socket = new Socket(uri.getHost(), 8888);
 
                     OutputStream output = socket.getOutputStream();
@@ -41,10 +42,9 @@ public class JoinMessageHandler implements Runnable{
                 }
             }
 
-        } catch (IOException | URISyntaxException e) {
-            System.out.println("Didn't give my log\n");
-        }
-        finally {
+        } catch (IOException | URISyntaxException | InterruptedException ignored) {
+
+        } finally {
             if(node.getRing().getResponsible(joinMessage.getSenderId()).equals(node.getAccessPoint())){
                 node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
 

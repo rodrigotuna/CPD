@@ -34,7 +34,11 @@ public class FileTransferHandler implements Runnable{
                 connecting = false;
             } catch (IOException e) {
                 connecting = true;
-                System.out.println("Ainda tou a espera pá");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
 
