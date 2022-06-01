@@ -18,8 +18,6 @@ public class TCPMembershipSocketHandler implements Runnable {
 
     private final BlockingQueue<TCPMembershipMessage> membershipMessages = new LinkedBlockingQueue<>();
 
-    private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-
     public TCPMembershipSocketHandler(ServerSocket nodeSocket, Node node) {
         this.nodeSocket = nodeSocket;
         this.node = node;
@@ -31,10 +29,10 @@ public class TCPMembershipSocketHandler implements Runnable {
         try {
             while (true) {
                 socket = nodeSocket.accept();
-                executor.execute(new TCPMessageHandler(socket));
+                node.executeThread(new TCPMessageHandler(socket));
             }
         } catch (IOException e) {
-            System.out.println("Thread vai acabar");
+            System.out.println("Closing connections on membership socket");
         }
     }
 

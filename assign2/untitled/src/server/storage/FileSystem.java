@@ -4,14 +4,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class FileSystem {
 
     private String path;
+    private String hashId;
 
-    public FileSystem(String accessPoint){
-        this.path = "filesystem/" + accessPoint + "/";
+    public FileSystem(String accessPoint, String hashId){
+        this.path = "filesystem/" + hashId + "/";
+        this.hashId = hashId;
         File theDir = new File(path);
         if (!theDir.exists()){
             theDir.mkdirs();
@@ -34,7 +40,7 @@ public class FileSystem {
 
     public void delete(String key){
         try {
-            File file = new File(path + key + ".file");
+            File file = new File(path + key);
             if (!file.exists()) throw new FileNotFoundException();
 
             if(!file.delete()) throw new IOException();
@@ -45,5 +51,11 @@ public class FileSystem {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<File> getFiles() {
+        File dir = new File(path);
+        return Arrays.stream(Objects.requireNonNull(dir.listFiles()))
+                .collect(Collectors.toList());
     }
 }

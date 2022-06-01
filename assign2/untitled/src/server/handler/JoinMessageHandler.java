@@ -4,11 +4,13 @@ import server.Node;
 import server.message.JoinMessage;
 import server.message.TCPMembershipMessage;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class JoinMessageHandler implements Runnable{
     private final JoinMessage joinMessage;
@@ -25,7 +27,6 @@ public class JoinMessageHandler implements Runnable{
         try {
             node.getMembershipLog().addEntry(joinMessage.getAccessPoint(),
                     joinMessage.getMembershipCounter());
-            node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
             synchronized (node.getMembershipLog().getMostRecentlyUpdated()){
                 if(!node.getMembershipLog().getMostRecentlyUpdated().equals(joinMessage.getSenderId())){
                     URI uri = new URI(null, joinMessage.getAccessPoint(), null, null, null);
@@ -40,11 +41,22 @@ public class JoinMessageHandler implements Runnable{
                 }
             }
 
-            if(node.getRing().getResponsible(joinMessage.getSenderId()).equals(node.getAccessPoint())){
-
-            }
         } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
+            System.out.println("Didn't give my log\n");
+        }
+        finally {
+            if(node.getRing().getResponsible(joinMessage.getSenderId()).equals(node.getAccessPoint())){
+                node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
+
+                List<File> prevFiles = node.getFileSystem().getFiles();
+                for(File file : prevFiles){
+                    if(node.getRing().getResponsible(file.getName()).equals(joinMessage.getAccessPoint())){
+                        System.out.println("Esto file va para outro coño " + file.getName());
+                    }
+                }
+            }else{
+                node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
+            }
         }
     }
 }

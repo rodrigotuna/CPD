@@ -4,7 +4,9 @@ import server.Node;
 import server.message.JoinMessage;
 import server.message.LeaveMessage;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class LeaveHandler implements Runnable{
     private final Node node;
@@ -23,8 +25,13 @@ public class LeaveHandler implements Runnable{
             node.getMembershipSocket().send(new LeaveMessage(node.getHashId(),
                     node.getMembershipAddress(), membershipCounter).getDatagram());
 
-            //TODO Mandar os ficheiros que tenho a quem devo mandar
             node.getTcpSocketHandler().stop();
+            node.getRing().removeMember(node.getHashId());
+            String recipient = node.getRing().getResponsible(node.getHashId());
+            List<File> files = node.getFileSystem().getFiles();
+            for(File file : files){
+                System.out.println("Mandar los files");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -34,8 +34,9 @@ public class Node implements MembershipInterface {
 
     private final MulticastSocketHandler multicastSocketHandler;
     private TCPSocketHandler tcpSocketHandler;
-
     private TCPMembershipSocketHandler tcpMembershipSocketHandler;
+
+    private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
     public Node(InetSocketAddress membershipAddress, InetSocketAddress accessPoint) throws IOException, AlreadyBoundException, NoSuchAlgorithmException {
 
@@ -47,7 +48,7 @@ public class Node implements MembershipInterface {
 
         this.membershipLog = new MembershipLog(getAccessPoint());
         this.ring = new Ring();
-        this.fileSystem = new FileSystem(getAccessPoint());
+        this.fileSystem = new FileSystem(getAccessPoint(), hashId);
 
         MembershipInterface stub = (MembershipInterface) UnicastRemoteObject.exportObject(this, 0);
 
@@ -139,5 +140,9 @@ public class Node implements MembershipInterface {
 
     public FileSystem getFileSystem() {
         return fileSystem;
+    }
+
+    public void executeThread(Runnable runnable){
+        executor.execute(runnable);
     }
 }

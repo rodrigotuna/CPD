@@ -20,8 +20,6 @@ public class TCPSocketHandler implements Runnable{
 
     private final BlockingQueue<byte []> membershipMessages = new LinkedBlockingQueue<>();
 
-    private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-
     public TCPSocketHandler(ServerSocket nodeSocket, Node node){
         this.nodeSocket = nodeSocket;
         this.node = node;
@@ -31,7 +29,7 @@ public class TCPSocketHandler implements Runnable{
     public void run() {
         try{
             while (true) {
-                executor.execute(new TCPMessageHandler(nodeSocket.accept()));
+                node.executeThread(new TCPMessageHandler(nodeSocket.accept()));
             }
         }
         catch (IOException e) {
