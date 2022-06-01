@@ -95,9 +95,10 @@ public class TCPSocketHandler implements Runnable{
 
                 OutputStream outputStream = socket.getOutputStream();
                 PrintWriter pw = new PrintWriter(outputStream, true);
+                String responsibleAccessPoint = node.getRing().getResponsible(message.getKey());
+
                 switch (message.getType()) {
                     case "PUT":
-                        String responsibleAccessPoint = node.getRing().getResponsible(message.getKey());
                         if(responsibleAccessPoint.equals(node.getAccessPoint())){
                             pw.println(200);
                             byte [] data = inputStream.readAllBytes();
@@ -110,20 +111,20 @@ public class TCPSocketHandler implements Runnable{
                     case "GET":
                         break;
                     case "DELETE":
-                        deleteValue(node.getAccessPoint(), message.getKey());
+                        if(responsibleAccessPoint.equals(node.getAccessPoint())){
+                            pw.println(200);
+                            deleteValue(node.getAccessPoint(), message.getKey());
+                        }else{
+                            pw.println(300);
+                            pw.println(responsibleAccessPoint);
+                        }
                         // SEND OK MESSAGE?
-                        break;
-                    case "MEMBERSHIP":
-                        System.out.println(inputStream);
-                        byte[] data = inputStream.readAllBytes();
-                        System.out.println("TO queue:\n" + new String(data));
-                        membershipMessages.put(data);
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + message.getType());
                 }
-                System.out.println("Me voy voy voy");
-            } catch (IOException | InterruptedException e) {
+
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }

@@ -41,7 +41,7 @@ public class Node implements MembershipInterface {
         this.accessPoint = accessPoint;
         this.hashId = Utils.bytesToHexString(Utils.hash256(getAccessPoint().getBytes()));
 
-        this.membershipLog = new MembershipLog(hashId);
+        this.membershipLog = new MembershipLog(getAccessPoint());
         this.ring = new Ring();
 
         MembershipInterface stub = (MembershipInterface) UnicastRemoteObject.exportObject(this, 0);

@@ -92,8 +92,22 @@ public class Client {
 
             PrintWriter messageWriter = new PrintWriter(messageStream, true);
             messageWriter.println((new DeleteMessage(hashcode)).getDataStringStream());
+
+            InputStream inputStream = this.socket.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String code = bufferedReader.readLine();
+            System.out.println(code);
+            switch(Integer.parseInt(code)){
+                case 200:
+                    System.out.println("200: OK Successful Operation");
+                    break;
+                case 300:
+                    System.out.println("300: Redirect");
+                    String accessPoint = bufferedReader.readLine();
+                    new Client(accessPoint).delete(hashcode);
+            }
         }
-        catch (IOException e){
+        catch (IOException | URISyntaxException e){
             throw new RuntimeException(e);
         }
     }

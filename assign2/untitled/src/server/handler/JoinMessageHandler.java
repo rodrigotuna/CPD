@@ -23,7 +23,7 @@ public class JoinMessageHandler implements Runnable{
     @Override
     public void run() {
         try {
-            node.getMembershipLog().addEntry(joinMessage.getSenderId(),
+            node.getMembershipLog().addEntry(joinMessage.getAccessPoint(),
                     joinMessage.getMembershipCounter());
             node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
             synchronized (node.getMembershipLog().getMostRecentlyUpdated()){
