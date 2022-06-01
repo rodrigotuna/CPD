@@ -26,7 +26,8 @@ public class FileSystem {
 
     public void put(String key, String fileContent){
         try {
-            File file = new File(path + key + ".file");
+            File file = new File(path + key);
+            System.out.println(fileContent);
             if (!file.getParentFile().isDirectory()) file.getParentFile().mkdirs();
 
             FileWriter valueWriter = new FileWriter(file);

@@ -31,6 +31,7 @@ public class LeaveHandler implements Runnable{
             List<File> files = node.getFileSystem().getFiles();
             for(File file : files){
                 System.out.println("Mandar los files");
+                node.executeThread(new FileTransferHandler(file, recipient));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

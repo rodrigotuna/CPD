@@ -51,7 +51,7 @@ public class JoinMessageHandler implements Runnable{
                 List<File> prevFiles = node.getFileSystem().getFiles();
                 for(File file : prevFiles){
                     if(node.getRing().getResponsible(file.getName()).equals(joinMessage.getAccessPoint())){
-                        System.out.println("Esto file va para outro coño " + file.getName());
+                        node.executeThread(new FileTransferHandler(file, joinMessage.getAccessPoint()));
                     }
                 }
             }else{
