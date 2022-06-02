@@ -30,16 +30,14 @@ public class Ring {
     }
 
     public List<String> getResponsible(String fileId){
-        int factor = Math.min(ring.size(), REPLICATION_FACTOR);
         List<String> storeNodes = new ArrayList<>();
 
         String responsible = ring.get(Utils.circularUpperBound(ring, fileId));
-        for(int i = 0; i < factor; i++) {
+        for(int i = 0; i < REPLICATION_FACTOR; i++) {
             storeNodes.add(responsible);
             responsible = ring.get(Utils.circularNextValue(ring,
                     Utils.bytesToHexString(Utils.hash256(responsible.getBytes()))));
         }
-        System.out.println(storeNodes);
         return storeNodes;
     }
 

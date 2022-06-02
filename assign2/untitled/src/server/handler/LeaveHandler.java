@@ -29,7 +29,7 @@ public class LeaveHandler implements Runnable{
             String recipient = node.getRing().getResponsible(node.getHashId()).get(0);
             List<File> files = node.getFileSystem().getFiles();
             for(File file : files){
-                node.executeThread(new FileTransferHandler(file, recipient, node));
+                node.executeThread(new FileTransferHandler(file, recipient, node, 0, true));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

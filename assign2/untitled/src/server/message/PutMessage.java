@@ -4,11 +4,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class PutMessage extends TCPMessage{
-    public PutMessage(String key, String body) {
+    private final int factor;
+    public PutMessage(int factor, String key) {
         super("PUT", key);
-        setBody(body);
+        this.factor = factor;
     }
-    public PutMessage(String key) {
-        super("PUT", key);
+
+    @Override
+    public String getHeader() {
+        return super.getHeader() + " " + factor;
+    }
+
+    public int getFactor() {
+        return factor;
     }
 }

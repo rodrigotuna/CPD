@@ -28,7 +28,6 @@ public class JoinHandler implements Runnable{
             node.getMembershipLog().incrementCounter();
             int membershipCounter = node.getMembershipLog().getMembershipCounter();
             node.getRing().addMember(node.getHashId(), node.getAccessPoint());
-            System.out.println(node.getRing().getNext(node.getHashId()));
             node.StartTCPMembershipSocket();
             for(int i = 0; i < NUM_TRIES; i++){
                 node.getMembershipSocket().send(new JoinMessage(node.getHashId(),
@@ -41,7 +40,6 @@ public class JoinHandler implements Runnable{
                         System.out.println("Not enough messages retrying...");
                         break;
                     }else{
-                        System.out.println(node.getHashId() + ":\n" + membershipMessage.getDataStringStream());
                         logsReceived[numLogsReceived++] = membershipMessage.getBody();
                     }
                 }

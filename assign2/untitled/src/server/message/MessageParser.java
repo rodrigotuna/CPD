@@ -38,11 +38,11 @@ public class MessageParser {
             case "MEMBERSHIP":
                 return new TCPMembershipMessage(key);
             case "PUT":
-                return new PutMessage(key);
+                return new PutMessage(Integer.parseInt(headerFields[2]),key);
             case "DELETE":
-                return new DeleteMessage(key);
+                return new DeleteMessage(Integer.parseInt(headerFields[2]),key);
             case "GET":
-                return new GetMessage(key);
+                return new GetMessage(Integer.parseInt(headerFields[2]),key);
         }
         return null;
     }
@@ -52,17 +52,10 @@ public class MessageParser {
         String [] headerFields =header.split("[ ]+");
         String type = headerFields[0];
         String key = headerFields[1];
-        switch(type){
-            case "MEMBERSHIP":
-                return new TCPMembershipMessage(key,
-                        bytesToString(Arrays.copyOfRange(data, headerSize + 4, data.length)));
-            case "PUT":
-                return new PutMessage(key,
-                        bytesToString((Arrays.copyOfRange(data, headerSize + 4, data.length))));
-            case "DELETE":
-                return new DeleteMessage(key);
-            case "GET":
-                return new GetMessage(key);
+
+        if ("MEMBERSHIP".equals(type)) {
+            return new TCPMembershipMessage(key,
+                    bytesToString(Arrays.copyOfRange(data, headerSize + 4, data.length)));
         }
         return null;
     }

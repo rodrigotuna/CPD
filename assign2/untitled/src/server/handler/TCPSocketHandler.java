@@ -2,10 +2,7 @@
 package server.handler;
 
 import server.Node;
-import server.message.PutMessage;
-import server.message.TCPMembershipMessage;
-import server.message.TCPMessage;
-import server.message.MessageParser;
+import server.message.*;
 import utils.Utils;
 
 import java.io.*;
@@ -62,23 +59,31 @@ public class TCPSocketHandler implements Runnable{
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String header = bufferedReader.readLine();
                 System.out.println(header);
-                System.out.println(inputStream);
                 TCPMessage message = new MessageParser().parseHeader(header);
 
                 OutputStream outputStream = socket.getOutputStream();
                 PrintWriter pw = new PrintWriter(outputStream, true);
                 List<String> responsibleAccessPoints = node.getRing().getResponsible(message.getKey());
-                System.out.println(message.getType());
 
                 switch (message.getType()) {
                     case "PUT":
-                        if(responsibleAccessPoints.get(0).equals(node.getAccessPoint())){
+                        PutMessage putMessage = (PutMessage) message;
+                        if(responsibleAccessPoints.get(putMessage.getFactor()).equals(node.getAccessPoint())){
                             pw.println(200);
                             byte [] data = inputStream.readAllBytes();
-                            node.getFileSystem().put(message.getKey(), new String(data));
+                            File file = node.getFileSystem().put(message.getKey(), new String(data), putMessage.getFactor());
+
+                            //REPLICATION
+                            if(putMessage.getFactor() == 0){
+                                System.out.println(putMessage.getFactor());
+                                System.out.println("LOOOOKKKKK:" + responsibleAccessPoints.get(1));
+                                node.executeThread(new FileTransferHandler(file, responsibleAccessPoints.get(1), node, 1, false));
+                                node.executeThread(new FileTransferHandler(file, responsibleAccessPoints.get(2), node, 2, false));
+                            }
+
                         }else {
                             pw.println(300);
-                            pw.println(responsibleAccessPoints.get(0));
+                            pw.println(responsibleAccessPoints.get(putMessage.getFactor()));
                         }
                         break;
                     case "GET":
@@ -93,12 +98,19 @@ public class TCPSocketHandler implements Runnable{
                         }
                         break;
                     case "DELETE":
-                        if(responsibleAccessPoints.get(0).equals(node.getAccessPoint())){
+                        DeleteMessage deleteMessage = (DeleteMessage) message;
+                        if(responsibleAccessPoints.get(deleteMessage.getFactor()).equals(node.getAccessPoint())){
                             pw.println(200);
-                            node.getFileSystem().delete(message.getKey());
+                            node.getFileSystem().delete(message.getKey(), deleteMessage.getFactor());
+
+                            //REPLICATION
+                            if(deleteMessage.getFactor() == 0){
+                                node.executeThread(new DeleteFileOtherNode(message.getKey(), responsibleAccessPoints.get(1), node, 1));
+                                node.executeThread(new DeleteFileOtherNode(message.getKey(), responsibleAccessPoints.get(2), node, 2));
+                            }
                         }else{
                             pw.println(300);
-                            pw.println(responsibleAccessPoints.get(0));
+                            pw.println(responsibleAccessPoints.get(deleteMessage.getFactor()));
                         }
                         break;
                     default:

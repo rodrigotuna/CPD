@@ -31,13 +31,12 @@ public class Client {
 
             byte[] fileContent = Files.readAllBytes(file.toPath());
             String fileKey = Utils.bytesToHexString(Utils.hash256(fileContent));
-            writer.println((new PutMessage(fileKey).getDataStringStream()));
+            writer.println((new PutMessage(0,fileKey).getDataStringStream()));
 
 
             InputStream inputStream = this.socket.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String code = bufferedReader.readLine();
-            System.out.println(code);
             switch(Integer.parseInt(code)){
                 case 200:
                     System.out.println("200: OK Successful Operation");
@@ -62,12 +61,11 @@ public class Client {
             OutputStream messageStream = this.socket.getOutputStream();
 
             PrintWriter messageWriter = new PrintWriter(messageStream, true);
-            messageWriter.println((new GetMessage(hashcode)).getDataStringStream());
+            messageWriter.println((new GetMessage(0, hashcode)).getDataStringStream());
 
             InputStream inputStream = this.socket.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String code = bufferedReader.readLine();
-            System.out.println(code);
             switch(Integer.parseInt(code)){
                 case 200:
 
@@ -98,12 +96,11 @@ public class Client {
             OutputStream messageStream = this.socket.getOutputStream();
 
             PrintWriter messageWriter = new PrintWriter(messageStream, true);
-            messageWriter.println((new DeleteMessage(hashcode)).getDataStringStream());
+            messageWriter.println((new DeleteMessage(0, hashcode)).getDataStringStream());
 
             InputStream inputStream = this.socket.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String code = bufferedReader.readLine();
-            System.out.println(code);
             switch(Integer.parseInt(code)){
                 case 200:
                     System.out.println("200: OK Successful Operation");
