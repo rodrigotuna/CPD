@@ -23,13 +23,15 @@ import java.util.concurrent.TimeUnit;
 public class Node implements MembershipInterface {
 
     private final String hashId;
+    private Boolean membershipRunning;
+
+    private State state;
     private final InetSocketAddress membershipAddress;
     private final MulticastSocket membershipSocket;
     private final InetSocketAddress accessPoint;
 
     private final MembershipLog membershipLog;
     private final Ring ring;
-
     private final FileSystem fileSystem;
 
     private final MulticastSocketHandler multicastSocketHandler;
@@ -45,6 +47,7 @@ public class Node implements MembershipInterface {
 
         this.accessPoint = accessPoint;
         this.hashId = Utils.bytesToHexString(Utils.hash256(getAccessPoint().getBytes()));
+        this.state = State.OUT;
 
         this.membershipLog = new MembershipLog(getAccessPoint());
         this.ring = new Ring();
@@ -61,16 +64,20 @@ public class Node implements MembershipInterface {
         multicastThread.start();
     }
 
-    public void join(){
-        JoinHandler joinHandler = new JoinHandler( this);
-        Thread joinThread = new Thread(joinHandler);
-        joinThread.start();
+    public void join() {
+        if (state == State.OUT) {
+            JoinHandler joinHandler = new JoinHandler(this);
+            Thread joinThread = new Thread(joinHandler);
+            joinThread.start();
+        }
     }
 
-    public void leave() throws IOException {
-        LeaveHandler leaveHandler = new LeaveHandler(this);
-        Thread leaveThread = new Thread(leaveHandler);
-        leaveThread.start();
+    public void leave() {
+        if (state == State.IN) {
+            LeaveHandler leaveHandler = new LeaveHandler(this);
+            Thread leaveThread = new Thread(leaveHandler);
+            leaveThread.start();
+        }
     }
 
     public String getAccessPoint() {
@@ -78,6 +85,7 @@ public class Node implements MembershipInterface {
     }
 
     public void StartMembershipSocket() throws IOException {
+        state = State.IN;
         membershipSocket.joinGroup(membershipAddress.getAddress());
     }
 
@@ -90,6 +98,7 @@ public class Node implements MembershipInterface {
         Thread tcpThread = new Thread(tcpHandler);
         tcpThread.start();
     }
+
     public void StartTCPSocket() throws IOException {
         ServerSocket socket = new ServerSocket();
         socket.bind(accessPoint);
@@ -119,7 +128,7 @@ public class Node implements MembershipInterface {
         return tcpMembershipSocketHandler;
     }
 
-    public String getHashId(){
+    public String getHashId() {
         return hashId;
     }
 
@@ -128,6 +137,7 @@ public class Node implements MembershipInterface {
     }
 
     public void stopMembershipSocket() throws IOException {
+        state = State.OUT;
         membershipSocket.leaveGroup(membershipAddress.getAddress());
     }
 
@@ -140,11 +150,23 @@ public class Node implements MembershipInterface {
         return fileSystem;
     }
 
-    public void executeThread(Runnable runnable){
+    public void executeThread(Runnable runnable) {
         executor.execute(runnable);
     }
 
-    public void scheduleThread(Runnable runnable, int millis){
+    public void scheduleThread(Runnable runnable, int millis) {
         executor.schedule(runnable, millis, TimeUnit.MILLISECONDS);
+    }
+
+    public boolean membershipRunning() {
+        return membershipRunning;
+    }
+
+    public void setMembershipRunning(Boolean membershipRunning) {
+        this.membershipRunning = membershipRunning;
+    }
+
+    public State getState() {
+        return state;
     }
 }

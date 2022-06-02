@@ -1,0 +1,28 @@
+package server.handler;
+
+import server.Node;
+import server.State;
+
+public class PeriodicMembershipRecovery implements Runnable{
+    private final Node node;
+    PeriodicMembershipRecovery(Node node){
+        this.node = node;
+    }
+    @Override
+    public void run() {
+        System.out.println("IS EVERYTHING RUNNING?");
+        if(node.getState() == State.OUT){
+            return;
+        }
+        if (node.membershipRunning()) {
+            node.setMembershipRunning(false);
+        } else {
+            if (node.getRing().isFirst(node.getHashId())) {
+                node.executeThread(new PeriodicMembership(node));
+            } else {
+                System.out.println("O PAI GRANDE CAIU I GUESS");
+            }
+        }
+        node.scheduleThread(new PeriodicMembershipRecovery(node), 4000);
+    }
+}

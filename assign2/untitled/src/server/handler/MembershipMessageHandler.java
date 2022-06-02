@@ -19,6 +19,7 @@ public class MembershipMessageHandler implements Runnable{
     @Override
     public void run() {
         try {
+            node.setMembershipRunning(true);
             if(membershipMessage.getNextId().equals(node.getHashId())){
                 node.scheduleThread(new PeriodicMembership(node), 1000);
             }

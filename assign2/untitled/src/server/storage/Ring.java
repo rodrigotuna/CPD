@@ -55,4 +55,8 @@ public class Ring {
         Map.Entry<String, String> next = ring.higherEntry(hashId);
         return next == null ? ring.firstKey() : next.getKey();
     }
+
+    public boolean isFirst(String hashId) {
+        return ring.firstKey().equals(hashId);
+    }
 }

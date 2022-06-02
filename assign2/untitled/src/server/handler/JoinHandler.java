@@ -53,8 +53,10 @@ public class JoinHandler implements Runnable{
                 node.getMembershipLog().mergeLog(logsReceived[i].substring(0,index));
                 node.getRing().mergeRing(logsReceived[i].substring(index+2));
             }
+            node.setMembershipRunning(false);
             node.StartMembershipSocket();
             node.StartTCPSocket();
+            node.scheduleThread(new PeriodicMembershipRecovery(node),4000);
         } catch (IOException | InterruptedException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
