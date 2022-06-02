@@ -15,7 +15,12 @@ public class PeriodicMembership implements Runnable{
     @Override
     public void run() {
         try {
-            node.getMembershipSocket().send(new UDPMembershipMessage(node.getHashId(), node.getMembershipAddress()).getDatagram());
+            String body = Math.random() > Math.exp(-node.getMembershipLog().getPenalty())
+                    ? node.getMembershipLog().mostRecentLogContent() : "";
+            node.getMembershipSocket().send(new UDPMembershipMessage(node.getHashId(),
+                                                                     node.getMembershipAddress(),
+                                                                     node.getRing().getNext(node.getHashId()),
+                                                                     body).getDatagram());
 
         } catch (IOException e) {
             throw new RuntimeException(e);

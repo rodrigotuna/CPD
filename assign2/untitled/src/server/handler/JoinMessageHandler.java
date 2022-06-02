@@ -30,7 +30,7 @@ public class JoinMessageHandler implements Runnable{
             synchronized (node.getMembershipLog().getMostRecentlyUpdated()){
                 if(!node.getMembershipLog().getMostRecentlyUpdated().equals(joinMessage.getSenderId())){
                     URI uri = new URI(null, joinMessage.getAccessPoint(), null, null, null);
-                    Thread.sleep(500/(node.getMembershipLog().getScore() + 1));
+                    Thread.sleep(node.getMembershipLog().getPenalty());
                     Socket socket = new Socket(uri.getHost(), 8888);
 
                     OutputStream output = socket.getOutputStream();

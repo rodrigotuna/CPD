@@ -50,4 +50,9 @@ public class Ring {
             addMember(entryValues[0], entryValues[1]);
         }
     }
+
+    public String getNext(String hashId) {
+        Map.Entry<String, String> next = ring.higherEntry(hashId);
+        return next == null ? ring.firstKey() : next.getKey();
+    }
 }

@@ -53,7 +53,8 @@ public class FileTransferHandler implements Runnable{
 
             InputStream inputStream = socket.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            bufferedReader.readLine();
+            String code = bufferedReader.readLine();
+
             messageStream.write(fileContent);
             messageStream.flush(); messageStream.close();
             file.delete();

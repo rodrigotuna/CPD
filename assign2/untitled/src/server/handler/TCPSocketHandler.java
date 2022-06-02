@@ -68,6 +68,7 @@ public class TCPSocketHandler implements Runnable{
                 OutputStream outputStream = socket.getOutputStream();
                 PrintWriter pw = new PrintWriter(outputStream, true);
                 List<String> responsibleAccessPoints = node.getRing().getResponsible(message.getKey());
+                System.out.println(message.getType());
 
                 switch (message.getType()) {
                     case "PUT":

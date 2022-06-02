@@ -12,34 +12,30 @@ public class MembershipLog {
     private int membershipCounter;
     private String mostRecentlyUpdated;
 
-    private int score;
+    private int penalty;
 
     public boolean addEntry(String nodeId, int membershipCounter) throws IOException {
         if(mostRecent.containsKey(nodeId) && mostRecent.get(nodeId) >= membershipCounter ){
             return false;
         }
-        if (mostRecent.containsKey(nodeId)) score -= mostRecent.get(nodeId);
         updateFileLine(nodeId,membershipCounter);
-        score += mostRecent.get(nodeId);
         return true;
     }
 
     public MembershipLog(String hashId) throws IOException {
         this.hashId = hashId;
+        this.penalty = 0;
         file = new File(hashId + ".log");
         if(!file.exists()){
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(hashId + ";" + -1 + "\n");
             membershipCounter = -1;
-            this.score = -1;
             fileWriter.close();
         }else{
             Scanner sc = new Scanner(file);
-            this.score = 0;
             while (sc.hasNext()) {
                 String[] entries = sc.next().split(";");
                 mostRecent.put(entries[0], Integer.parseInt(entries[1]));
-                score += Integer.parseInt(entries[1]);
             }
         }
         mostRecentlyUpdated = hashId;
@@ -51,7 +47,6 @@ public class MembershipLog {
 
     public void incrementCounter() throws IOException {
         membershipCounter++;
-        score++;
         updateFileLine(hashId, membershipCounter);
     }
 
@@ -94,8 +89,11 @@ public class MembershipLog {
             if (!mostRecent.containsKey(entryValues[0])) {
                 logContent.add(entry);
                 mostRecent.put(entryValues[0], Integer.parseInt(entryValues[1]));
+                penalty++;
             } else if (mostRecent.get(entryValues[0]) < Integer.parseInt(entryValues[1])) {
                 logContent.remove(entryValues[0] + ";" + mostRecent.get(entryValues[0]));
+                mostRecent.put(entryValues[0], Integer.parseInt(entryValues[1]));
+                penalty++;
             }
         }
         FileWriter fw = new FileWriter(file);
@@ -121,7 +119,7 @@ public class MembershipLog {
         this.mostRecentlyUpdated = mostRecentlyUpdated;
     }
 
-    public int getScore() {
-        return score;
+    public int getPenalty() {
+        return penalty;
     }
 }

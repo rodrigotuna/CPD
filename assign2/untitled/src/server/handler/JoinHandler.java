@@ -28,6 +28,7 @@ public class JoinHandler implements Runnable{
             node.getMembershipLog().incrementCounter();
             int membershipCounter = node.getMembershipLog().getMembershipCounter();
             node.getRing().addMember(node.getHashId(), node.getAccessPoint());
+            System.out.println(node.getRing().getNext(node.getHashId()));
             node.StartTCPMembershipSocket();
             for(int i = 0; i < NUM_TRIES; i++){
                 node.getMembershipSocket().send(new JoinMessage(node.getHashId(),
