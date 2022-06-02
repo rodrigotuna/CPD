@@ -10,7 +10,6 @@ public class PeriodicMembershipRecovery implements Runnable{
     }
     @Override
     public void run() {
-        System.out.println("IS EVERYTHING RUNNING?");
         if(node.getState() == State.OUT){
             return;
         }
@@ -20,7 +19,7 @@ public class PeriodicMembershipRecovery implements Runnable{
             if (node.getRing().isFirst(node.getHashId())) {
                 node.executeThread(new PeriodicMembership(node));
             } else {
-                System.out.println("O PAI GRANDE CAIU I GUESS");
+
             }
         }
         node.scheduleThread(new PeriodicMembershipRecovery(node), 4000);

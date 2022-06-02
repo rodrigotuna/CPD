@@ -21,7 +21,6 @@ public class LeaveHandler implements Runnable{
             node.getMembershipLog().incrementCounter();
             int membershipCounter = node.getMembershipLog().getMembershipCounter();
             node.stopMembershipSocket();
-
             node.getMembershipSocket().send(new LeaveMessage(node.getHashId(),
                     node.getMembershipAddress(), membershipCounter).getDatagram());
 
@@ -30,8 +29,7 @@ public class LeaveHandler implements Runnable{
             String recipient = node.getRing().getResponsible(node.getHashId()).get(0);
             List<File> files = node.getFileSystem().getFiles();
             for(File file : files){
-                System.out.println("Mandar los files");
-                node.executeThread(new FileTransferHandler(file, recipient));
+                node.executeThread(new FileTransferHandler(file, recipient, node));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

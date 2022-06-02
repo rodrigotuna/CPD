@@ -1,6 +1,7 @@
 package server.handler;
 
 import client.Client;
+import server.Node;
 import server.message.PutMessage;
 import utils.Utils;
 
@@ -14,8 +15,11 @@ public class FileTransferHandler implements Runnable{
     private final File file;
     private final URI uri;
 
-    public FileTransferHandler(File file, String accessPoint) {
+    private final Node node;
+
+    public FileTransferHandler(File file, String accessPoint, Node node) {
         this.file = file;
+        this.node = node;
         try {
             this.uri = new URI(null, accessPoint, null, null, null);
         } catch (URISyntaxException e) {
@@ -25,7 +29,6 @@ public class FileTransferHandler implements Runnable{
 
     @Override
     public void run() {
-        // Espero que tipo o homem ligue a socket dele e de
         boolean connecting = true;
         Socket socket = null;
         while(connecting){
@@ -54,10 +57,16 @@ public class FileTransferHandler implements Runnable{
             InputStream inputStream = socket.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String code = bufferedReader.readLine();
-
-            messageStream.write(fileContent);
-            messageStream.flush(); messageStream.close();
-            file.delete();
+            switch(Integer.parseInt(code)){
+                case 200:
+                    messageStream.write(fileContent);
+                    messageStream.flush(); messageStream.close();
+                    file.delete();
+                    break;
+                case 300:
+                    String accessPoint = bufferedReader.readLine();
+                    node.executeThread(new FileTransferHandler(file, accessPoint, node));
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
