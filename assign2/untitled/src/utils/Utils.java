@@ -42,6 +42,11 @@ public class Utils{
         return upperBound == null ? map.firstKey() : upperBound;
     }
 
+    public static<K,V> K circularNextValue(TreeMap<K,V> map, K value){
+        K upperBound = map.higherKey(value);
+        return upperBound == null ? map.firstKey() : upperBound;
+    }
+
     public static int indexOf(byte[] array, byte[] subArray){
         for(int i = 0; i < array.length; i++){
             boolean found = true;

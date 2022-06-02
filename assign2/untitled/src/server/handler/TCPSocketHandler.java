@@ -1,3 +1,4 @@
+
 package server.handler;
 
 import server.Node;
@@ -10,6 +11,8 @@ import utils.Utils;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.*;
 
@@ -64,37 +67,37 @@ public class TCPSocketHandler implements Runnable{
 
                 OutputStream outputStream = socket.getOutputStream();
                 PrintWriter pw = new PrintWriter(outputStream, true);
-                String responsibleAccessPoint = node.getRing().getResponsible(message.getKey());
+                List<String> responsibleAccessPoints = node.getRing().getResponsible(message.getKey());
 
                 switch (message.getType()) {
                     case "PUT":
-                        if(responsibleAccessPoint.equals(node.getAccessPoint())){
+                        if(responsibleAccessPoints.get(0).equals(node.getAccessPoint())){
                             pw.println(200);
                             byte [] data = inputStream.readAllBytes();
                             node.getFileSystem().put(message.getKey(), new String(data));
-                        }else{
+                        }else {
                             pw.println(300);
-                            pw.println(responsibleAccessPoint);
+                            pw.println(responsibleAccessPoints.get(0));
                         }
                         break;
                     case "GET":
-                        if(responsibleAccessPoint.equals(node.getAccessPoint())){
+                        if(responsibleAccessPoints.get(0).equals(node.getAccessPoint())){
                             pw.println(200);
                             pw.println(node.getFileSystem().get(message.getKey()));
                             pw.flush();
                             socket.close();
                         }else{
                             pw.println(300);
-                            pw.println(responsibleAccessPoint);
+                            pw.println(responsibleAccessPoints.get(0));
                         }
                         break;
                     case "DELETE":
-                        if(responsibleAccessPoint.equals(node.getAccessPoint())){
+                        if(responsibleAccessPoints.get(0).equals(node.getAccessPoint())){
                             pw.println(200);
                             node.getFileSystem().delete(message.getKey());
                         }else{
                             pw.println(300);
-                            pw.println(responsibleAccessPoint);
+                            pw.println(responsibleAccessPoints.get(0));
                         }
                         break;
                     default:

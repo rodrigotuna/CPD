@@ -27,7 +27,7 @@ public class LeaveHandler implements Runnable{
 
             node.getTcpSocketHandler().stop();
             node.getRing().removeMember(node.getHashId());
-            String recipient = node.getRing().getResponsible(node.getHashId());
+            String recipient = node.getRing().getResponsible(node.getHashId()).get(0);
             List<File> files = node.getFileSystem().getFiles();
             for(File file : files){
                 System.out.println("Mandar los files");

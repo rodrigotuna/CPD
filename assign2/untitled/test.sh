@@ -14,7 +14,7 @@ java TestClient 127.0.0.3:8000 join &
 java TestClient 127.0.0.4:8000 join &
 java TestClient 127.0.0.5:8000 join &
 
-java TestClient 127.0.0.3:8000 put /ficheiro/xpto
+java TestClient 127.0.0.3:8000 put test
 ## retorna hash
 
 java TestClient 127.0.0.3:8000 get {hash}

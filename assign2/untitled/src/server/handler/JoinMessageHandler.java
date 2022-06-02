@@ -45,12 +45,12 @@ public class JoinMessageHandler implements Runnable{
         } catch (IOException | URISyntaxException | InterruptedException ignored) {
 
         } finally {
-            if(node.getRing().getResponsible(joinMessage.getSenderId()).equals(node.getAccessPoint())){
+            if(node.getRing().getResponsible(joinMessage.getSenderId()).get(0).equals(node.getAccessPoint())){
                 node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
 
                 List<File> prevFiles = node.getFileSystem().getFiles();
                 for(File file : prevFiles){
-                    if(node.getRing().getResponsible(file.getName()).equals(joinMessage.getAccessPoint())){
+                    if(node.getRing().getResponsible(file.getName()).get(0).equals(joinMessage.getAccessPoint())){
                         node.executeThread(new FileTransferHandler(file, joinMessage.getAccessPoint()));
                     }
                 }
