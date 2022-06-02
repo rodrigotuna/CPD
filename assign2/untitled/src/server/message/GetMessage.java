@@ -1,7 +1,7 @@
 package server.message;
 
 public class GetMessage extends TCPMessage{
-    public GetMessage(int factor, String key) {
+    public GetMessage(String key) {
         super("GET", key);
     }
 }

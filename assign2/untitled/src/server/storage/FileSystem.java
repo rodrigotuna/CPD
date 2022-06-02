@@ -53,9 +53,9 @@ public class FileSystem {
         }
     }
 
-    public String get(String key) {
+    public String get(String key, int factor) {
         try {
-            File file = new File(path + key);
+            File file = new File(path + factor + "/" + key);
             if (!file.exists()) throw new FileNotFoundException();
 
             byte[] fileContent = Files.readAllBytes(file.toPath());

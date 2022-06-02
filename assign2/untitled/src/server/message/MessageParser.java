@@ -42,7 +42,7 @@ public class MessageParser {
             case "DELETE":
                 return new DeleteMessage(Integer.parseInt(headerFields[2]),key);
             case "GET":
-                return new GetMessage(Integer.parseInt(headerFields[2]),key);
+                return new GetMessage(key);
         }
         return null;
     }

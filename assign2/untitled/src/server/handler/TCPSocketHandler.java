@@ -87,14 +87,14 @@ public class TCPSocketHandler implements Runnable{
                         }
                         break;
                     case "GET":
-                        if(responsibleAccessPoints.get(0).equals(node.getAccessPoint())){
+                        if(responsibleAccessPoints.contains(node.getAccessPoint())){
                             pw.println(200);
-                            pw.println(node.getFileSystem().get(message.getKey()));
+                            pw.println(node.getFileSystem().get(message.getKey(), responsibleAccessPoints.indexOf(node.getAccessPoint())));
                             pw.flush();
                             socket.close();
                         }else{
                             pw.println(300);
-                            pw.println(responsibleAccessPoints.get(0));
+                            pw.println(responsibleAccessPoints.get(0)); // TODO: Não sei se deva ir sempre para o zero?
                         }
                         break;
                     case "DELETE":

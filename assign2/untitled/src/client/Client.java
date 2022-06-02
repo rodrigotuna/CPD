@@ -61,7 +61,7 @@ public class Client {
             OutputStream messageStream = this.socket.getOutputStream();
 
             PrintWriter messageWriter = new PrintWriter(messageStream, true);
-            messageWriter.println((new GetMessage(0, hashcode)).getDataStringStream());
+            messageWriter.println((new GetMessage(hashcode)).getDataStringStream());
 
             InputStream inputStream = this.socket.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
