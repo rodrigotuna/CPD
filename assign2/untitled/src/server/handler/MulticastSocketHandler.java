@@ -1,10 +1,7 @@
 package server.handler;
 
 import server.Node;
-import server.message.JoinMessage;
-import server.message.LeaveMessage;
-import server.message.UDPMessage;
-import server.message.MessageParser;
+import server.message.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -34,18 +31,15 @@ public class MulticastSocketHandler implements Runnable{
             try {
                 membershipSocket.receive(packet);
                 UDPMessage message = messageParser.parse(packet);
-                Thread thread = null;
                 switch(message.getType()){
                     case "MEMBERSHIP":
-
+                        node.executeThread(new MembershipMessageHandler((UDPMembershipMessage) message, node));
                         break;
                     case "JOIN":
-                        thread = new Thread(new JoinMessageHandler((JoinMessage) message, node));
-                        thread.start();
+                        node.executeThread(new JoinMessageHandler((JoinMessage) message, node));
                         break;
                     case "LEAVE":
-                        thread = new Thread(new LeaveMessageHandler((LeaveMessage) message, node));
-                        thread.start();
+                        node.executeThread(new LeaveMessageHandler((LeaveMessage) message, node));
                         break;
                 }
 

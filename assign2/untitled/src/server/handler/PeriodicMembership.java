@@ -15,6 +15,7 @@ public class PeriodicMembership implements Runnable{
     @Override
     public void run() {
         try {
+            System.out.println(node.getAccessPoint()  + " - vou enviar o meu log periodico:");
             String body = Math.random() > Math.exp(-node.getMembershipLog().getPenalty())
                     ? node.getMembershipLog().mostRecentLogContent() : "";
             node.getMembershipSocket().send(new UDPMembershipMessage(node.getHashId(),

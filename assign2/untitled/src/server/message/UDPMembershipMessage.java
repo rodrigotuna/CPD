@@ -12,6 +12,11 @@ public class UDPMembershipMessage extends UDPMessage{
     }
 
     @Override
+    public String getHeader() {
+        return super.getHeader() + " " + nextId;
+    }
+
+    @Override
     public String getBody() {
         return body;
     }

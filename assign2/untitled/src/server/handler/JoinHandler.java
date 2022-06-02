@@ -47,6 +47,7 @@ public class JoinHandler implements Runnable{
                 }
             }
             node.getTcpMembershipSocketHandler().stop();
+            if(numLogsReceived == 0) node.scheduleThread(new PeriodicMembership(node), 1000);
             for(int i = 0; i < numLogsReceived; i++){
                 int index = Utils.indexOf(logsReceived[i].getBytes(), "\r\n".getBytes());
                 node.getMembershipLog().mergeLog(logsReceived[i].substring(0,index));

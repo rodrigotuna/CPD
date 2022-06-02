@@ -20,7 +20,7 @@ public class MembershipMessageHandler implements Runnable{
     public void run() {
         try {
             if(membershipMessage.getNextId().equals(node.getHashId())){
-                //Aqui dou schedule do coisinho
+                node.scheduleThread(new PeriodicMembership(node), 1000);
             }
             if(!membershipMessage.getBody().equals("")){
                 node.getMembershipLog().mergeLog(membershipMessage.getBody());

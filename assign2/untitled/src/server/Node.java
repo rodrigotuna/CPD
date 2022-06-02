@@ -36,7 +36,7 @@ public class Node implements MembershipInterface {
     private TCPSocketHandler tcpSocketHandler;
     private TCPMembershipSocketHandler tcpMembershipSocketHandler;
 
-    private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
 
     public Node(InetSocketAddress membershipAddress, InetSocketAddress accessPoint) throws IOException, AlreadyBoundException, NoSuchAlgorithmException {
 
@@ -89,7 +89,6 @@ public class Node implements MembershipInterface {
         this.tcpMembershipSocketHandler = tcpHandler;
         Thread tcpThread = new Thread(tcpHandler);
         tcpThread.start();
-        // TODO thread pool
     }
     public void StartTCPSocket() throws IOException {
         ServerSocket socket = new ServerSocket();
@@ -98,7 +97,6 @@ public class Node implements MembershipInterface {
         this.tcpSocketHandler = tcpHandler;
         Thread tcpThread = new Thread(tcpHandler);
         tcpThread.start();
-        // TODO thread pool
     }
 
     public MulticastSocket getMembershipSocket() {
@@ -144,5 +142,9 @@ public class Node implements MembershipInterface {
 
     public void executeThread(Runnable runnable){
         executor.execute(runnable);
+    }
+
+    public void scheduleThread(Runnable runnable, int millis){
+        executor.schedule(runnable, millis, TimeUnit.MILLISECONDS);
     }
 }
