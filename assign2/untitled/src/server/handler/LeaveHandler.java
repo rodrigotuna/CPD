@@ -3,6 +3,7 @@ package server.handler;
 import server.Node;
 import server.message.JoinMessage;
 import server.message.LeaveMessage;
+import server.storage.Ring;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +27,13 @@ public class LeaveHandler implements Runnable{
 
             node.getTcpSocketHandler().stop();
             node.getRing().removeMember(node.getHashId());
-            String recipient = node.getRing().getResponsible(node.getHashId()).get(0);
-            List<File> files = node.getFileSystem().getFiles();
-            for(File file : files){
-                node.executeThread(new FileTransferHandler(file, recipient, node, 0, true));
+            // TODO: Não sei se está a apagar direito
+            for(int i = 0; i < Ring.REPLICATION_FACTOR; i++){
+                String recipient = node.getRing().getResponsible(node.getHashId()).get(i);
+                List<File> files = node.getFileSystem().getFiles(i);
+                for(File file : files){
+                    node.executeThread(new FileTransferHandler(file, recipient, node, i, true));
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

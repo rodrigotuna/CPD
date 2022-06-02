@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -67,9 +68,12 @@ public class FileSystem {
         }
     }
 
-    public List<File> getFiles() {
-        File dir = new File(path);
-        return Arrays.stream(Objects.requireNonNull(dir.listFiles()))
+    public List<File> getFiles(int factor) {
+        System.out.println("PATH: " + path + factor);
+        File dir = new File(path + factor);
+        if(dir.listFiles() != null)
+            return Arrays.stream(Objects.requireNonNull(dir.listFiles()))
                 .collect(Collectors.toList());
+        return new ArrayList<>();
     }
 }

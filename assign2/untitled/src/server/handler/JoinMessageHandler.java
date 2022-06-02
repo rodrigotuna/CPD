@@ -3,6 +3,7 @@ package server.handler;
 import server.Node;
 import server.message.JoinMessage;
 import server.message.TCPMembershipMessage;
+import server.storage.Ring;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,15 +46,20 @@ public class JoinMessageHandler implements Runnable{
         } catch (IOException | URISyntaxException | InterruptedException ignored) {
 
         } finally {
+            System.out.println("RESPONSIBLE SENDER: " + node.getRing().getResponsible(joinMessage.getSenderId()));
+            System.out.println("ACCESS POINT: " + node.getAccessPoint());
             if(node.getRing().getResponsible(joinMessage.getSenderId()).get(0).equals(node.getAccessPoint())){
                 node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
-
-                List<File> prevFiles = node.getFileSystem().getFiles();
-                for(File file : prevFiles){
-                    if(node.getRing().getResponsible(file.getName()).get(0).equals(joinMessage.getAccessPoint())){
-                        node.executeThread(new FileTransferHandler(file, joinMessage.getAccessPoint(), node, 0, true));
+                for(int i = 0; i < Ring.REPLICATION_FACTOR; i++){
+                    List<File> prevFiles = node.getFileSystem().getFiles(i);
+                    for(File file : prevFiles){
+                        // TODO: Não sei se está a apagar direito
+                        if(node.getRing().getResponsible(file.getName()).get(i).equals(joinMessage.getAccessPoint())){
+                            node.executeThread(new FileTransferHandler(file, joinMessage.getAccessPoint(), node, i, true));
+                        }
                     }
                 }
+
             }else{
                 node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
             }
