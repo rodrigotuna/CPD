@@ -28,7 +28,7 @@ public class JoinHandler implements Runnable{
             node.getMembershipLog().incrementCounter();
             int membershipCounter = node.getMembershipLog().getMembershipCounter();
             node.getRing().addMember(node.getHashId(), node.getAccessPoint());
-            node.StartTCPMembershipSocket();
+            node.startTCPMembershipSocket();
             for(int i = 0; i < NUM_TRIES; i++){
                 node.getMembershipSocket().send(new JoinMessage(node.getHashId(),
                         node.getMembershipAddress(), membershipCounter, node.getAccessPoint()).getDatagram());
@@ -45,15 +45,15 @@ public class JoinHandler implements Runnable{
                 }
             }
             node.getTcpMembershipSocketHandler().stop();
-            if(numLogsReceived == 0) node.scheduleThread(new PeriodicMembership(node), 1000);
+            if(numLogsReceived == 0) node.scheduleThread(new PeriodicMembership(node, 0), 1000);
             for(int i = 0; i < numLogsReceived; i++){
                 int index = Utils.indexOf(logsReceived[i].getBytes(), "\r\n".getBytes());
                 node.getMembershipLog().mergeLog(logsReceived[i].substring(0,index));
                 node.getRing().mergeRing(logsReceived[i].substring(index+2));
             }
             node.setMembershipRunning(false);
-            node.StartMembershipSocket();
-            node.StartTCPSocket();
+            node.startMembershipSocket();
+            node.startTCPSocket();
             node.scheduleThread(new PeriodicMembershipRecovery(node),4000);
         } catch (IOException | InterruptedException | URISyntaxException e) {
             throw new RuntimeException(e);

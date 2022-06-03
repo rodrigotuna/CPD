@@ -21,7 +21,9 @@ public class MessageParser {
         String senderId = headerFields[1];
         switch(type){
             case "MEMBERSHIP":
-                return new UDPMembershipMessage(senderId, socketAddress, headerFields[2], bytesToString(Arrays.copyOfRange(data, headerSize + 4, data.length)));
+                byte [] body = Arrays.copyOfRange(data, headerSize + 4, data.length);
+                int bodyFinal = Utils.indexOf(body, new byte[]{0} );
+                return new UDPMembershipMessage(senderId, socketAddress, headerFields[2], new String(Arrays.copyOfRange(body, 0, bodyFinal)));
             case "JOIN":
                 return new JoinMessage(senderId, socketAddress, Integer.parseInt(headerFields[2]), headerFields[3]);
             case "LEAVE":

@@ -1,13 +1,11 @@
 package server;
 
 import server.handler.*;
-import server.state.JoinState;
 import server.storage.FileSystem;
 import server.storage.MembershipLog;
 import server.storage.Ring;
 import utils.Utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
@@ -15,9 +13,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class Node implements MembershipInterface {
@@ -38,7 +37,7 @@ public class Node implements MembershipInterface {
     private TCPSocketHandler tcpSocketHandler;
     private TCPMembershipSocketHandler tcpMembershipSocketHandler;
 
-    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
 
     public Node(InetSocketAddress membershipAddress, InetSocketAddress accessPoint) throws IOException, AlreadyBoundException, NoSuchAlgorithmException {
 
@@ -51,6 +50,7 @@ public class Node implements MembershipInterface {
 
         this.membershipLog = new MembershipLog(getAccessPoint());
         this.ring = new Ring();
+        addChanges(new ArrayList<>(), membershipLog.nodesJoined());
         this.fileSystem = new FileSystem(getAccessPoint(), hashId);
 
         MembershipInterface stub = (MembershipInterface) UnicastRemoteObject.exportObject(this, 0);
@@ -62,6 +62,12 @@ public class Node implements MembershipInterface {
         this.multicastSocketHandler = multicastHandler;
         Thread multicastThread = new Thread(multicastHandler);
         multicastThread.start();
+
+        if(membershipLog.getMembershipCounter() % 2 == 0){
+            startMembershipSocket();
+            startTCPSocket();
+            scheduleThread(new PeriodicMembershipRecovery(this), Math.max(4, ring.numClients())*1000);
+        }
     }
 
     public void join() {
@@ -84,12 +90,12 @@ public class Node implements MembershipInterface {
         return accessPoint.toString().substring(1);
     }
 
-    public void StartMembershipSocket() throws IOException {
+    public void startMembershipSocket() throws IOException {
         state = State.IN;
         membershipSocket.joinGroup(membershipAddress.getAddress());
     }
 
-    public void StartTCPMembershipSocket() throws IOException, URISyntaxException {
+    public void startTCPMembershipSocket() throws IOException, URISyntaxException {
         ServerSocket socket = new ServerSocket();
         URI uri = new URI(null, getAccessPoint(), null, null, null);
         socket.bind(new InetSocketAddress(uri.getHost(), 8888));
@@ -99,7 +105,7 @@ public class Node implements MembershipInterface {
         tcpThread.start();
     }
 
-    public void StartTCPSocket() throws IOException {
+    public void startTCPSocket() throws IOException {
         ServerSocket socket = new ServerSocket();
         socket.bind(accessPoint);
         TCPSocketHandler tcpHandler = new TCPSocketHandler(socket, this);
@@ -169,4 +175,15 @@ public class Node implements MembershipInterface {
     public State getState() {
         return state;
     }
+
+    public void addChanges(List<String> left, List<String> join) {
+        for(String s : left){
+            ring.removeMember(Utils.bytesToHexString(Utils.hash256(s.getBytes())));
+        }
+
+        for(String s : join){
+            ring.addMember(Utils.bytesToHexString(Utils.hash256(s.getBytes())), s);
+        }
+    }
+
 }

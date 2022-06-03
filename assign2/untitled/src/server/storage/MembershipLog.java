@@ -1,30 +1,40 @@
 package server.storage;
 
+import com.sun.source.tree.Tree;
+import server.message.TCPMembershipMessage;
+import utils.Utils;
+
 import java.io.*;
 import java.util.*;
-import java.util.regex.Pattern;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class MembershipLog {
     private final static int NUM_LOGS = 32;
     private final String hashId;
     private final File file;
-    private Map<String, Integer> mostRecent = new TreeMap<>();
+    private final ConcurrentHashMap<String, Integer> mostRecent = new ConcurrentHashMap<>();
     private int membershipCounter;
     private String mostRecentlyUpdated;
 
+    private final List<String> left;
+    private final List<String> join;
+
     private int penalty;
 
-    public boolean addEntry(String nodeId, int membershipCounter) throws IOException {
+    public void addEntry(String nodeId, int membershipCounter) throws IOException {
         if(mostRecent.containsKey(nodeId) && mostRecent.get(nodeId) >= membershipCounter ){
-            return false;
+            return;
         }
         updateFileLine(nodeId,membershipCounter);
-        return true;
     }
 
     public MembershipLog(String hashId) throws IOException {
         this.hashId = hashId;
         this.penalty = 0;
+        left = new ArrayList<>();
+        join = new ArrayList<>();
         file = new File(hashId + ".log");
         if(!file.exists()){
             FileWriter fileWriter = new FileWriter(file);
@@ -36,6 +46,7 @@ public class MembershipLog {
             while (sc.hasNext()) {
                 String[] entries = sc.next().split(";");
                 mostRecent.put(entries[0], Integer.parseInt(entries[1]));
+                addToList(entries[0], Integer.parseInt(entries[1]));
             }
         }
         mostRecentlyUpdated = hashId;
@@ -72,35 +83,75 @@ public class MembershipLog {
     }
 
     private ArrayList<String> getContents() throws FileNotFoundException {
-        Scanner sc = new Scanner(file);
+        Scanner sc = null;
         ArrayList<String> content = new ArrayList<>();
-        while (sc.hasNext()) {
-            String entry = sc.next();
-            content.add(entry);
+        synchronized (file){
+            sc = new Scanner(file);
+            while (sc.hasNext()) {
+                String entry = sc.next();
+                content.add(entry);
+            }
         }
         return content;
     }
 
-    public void mergeLog(String log) throws IOException {
+    private void addToList(String accessPoint, int membershipCounter){
+        if(membershipCounter % 2 == 0){
+            join.add(accessPoint);
+        } else{
+            left.add(accessPoint);
+        }
+    }
+
+
+    public ConfigurationFails mergeLog(String log) throws IOException {
+        ConfigurationFails cf = new ConfigurationFails();
         ArrayList<String> logContent =  getContents();
+
         String [] entryList = log.split("\n");
+
+        boolean changes = false;
+
         for(String entry : entryList) {
             String[] entryValues = entry.split(";");
             if (!mostRecent.containsKey(entryValues[0])) {
+                changes = true;
                 logContent.add(entry);
                 mostRecent.put(entryValues[0], Integer.parseInt(entryValues[1]));
+                cf.add(entryValues[0], Integer.parseInt(entryValues[1]));
                 penalty++;
-            } else if (mostRecent.get(entryValues[0]) < Integer.parseInt(entryValues[1])) {
-                logContent.remove(entryValues[0] + ";" + mostRecent.get(entryValues[0]));
-                mostRecent.put(entryValues[0], Integer.parseInt(entryValues[1]));
-                penalty++;
+            } else {
+                if (mostRecent.get(entryValues[0]) < Integer.parseInt(entryValues[1])) {
+                    changes = true;
+                    logContent.remove(entryValues[0] + ";" + mostRecent.get(entryValues[0]));
+                    logContent.add(entry);
+                    mostRecent.put(entryValues[0], Integer.parseInt(entryValues[1]));
+                    cf.add(entryValues[0], Integer.parseInt(entryValues[1]));
+                    penalty++;
+                }
             }
         }
-        FileWriter fw = new FileWriter(file);
-        for(String s : logContent){
-            fw.write(s + "\n");
+
+        if(!changes) return cf;
+        synchronized (file){
+            FileWriter fw = new FileWriter(file);
+            for(String s : logContent){
+                fw.write(s + "\n");
+            }
+            fw.close();
         }
-        fw.close();
+
+        return cf;
+    }
+
+    public List<String> nodesJoined(){
+        List<String> ret = new ArrayList<>();
+        for(String s : mostRecent.keySet()){
+            if(mostRecent.get(s) % 2 ==0){
+                ret.add(s);
+            }
+        }
+        return ret;
     }
 
     public String mostRecentLogContent() throws FileNotFoundException {

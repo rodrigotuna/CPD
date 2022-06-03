@@ -75,8 +75,6 @@ public class TCPSocketHandler implements Runnable{
 
                             //REPLICATION
                             if(putMessage.getFactor() == 0){
-                                System.out.println(putMessage.getFactor());
-                                System.out.println("LOOOOKKKKK:" + responsibleAccessPoints.get(1));
                                 node.executeThread(new FileTransferHandler(file, responsibleAccessPoints.get(1), node, 1, false));
                                 node.executeThread(new FileTransferHandler(file, responsibleAccessPoints.get(2), node, 2, false));
                             }

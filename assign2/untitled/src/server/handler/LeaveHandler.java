@@ -22,7 +22,7 @@ public class LeaveHandler implements Runnable{
             node.getMembershipLog().incrementCounter();
             int membershipCounter = node.getMembershipLog().getMembershipCounter();
             node.stopMembershipSocket();
-            node.getMembershipSocket().send(new LeaveMessage(node.getHashId(),
+            node.getMembershipSocket().send(new LeaveMessage(node.getAccessPoint(),
                     node.getMembershipAddress(), membershipCounter).getDatagram());
 
             node.getTcpSocketHandler().stop();

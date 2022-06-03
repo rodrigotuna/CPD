@@ -1,8 +1,8 @@
 package server.handler;
 
 import server.Node;
-import server.message.TCPMembershipMessage;
 import server.message.UDPMembershipMessage;
+import server.storage.ConfigurationFails;
 
 import java.io.IOException;
 
@@ -21,10 +21,12 @@ public class MembershipMessageHandler implements Runnable{
         try {
             node.setMembershipRunning(true);
             if(membershipMessage.getNextId().equals(node.getHashId())){
-                node.scheduleThread(new PeriodicMembership(node), 1000);
+                node.scheduleThread(new PeriodicMembership(node, node.getMembershipLog().getMembershipCounter()), 1000);
             }
-            if(!membershipMessage.getBody().equals("")){
-                node.getMembershipLog().mergeLog(membershipMessage.getBody());
+
+            if(!membershipMessage.getBody().equals("") && !membershipMessage.getSenderId().equals(node.getHashId())){
+                ConfigurationFails cf = node.getMembershipLog().mergeLog(membershipMessage.getBody());
+                node.addChanges(cf.getLeft(), cf.getJoin());
             }
 
         } catch (IOException e) {

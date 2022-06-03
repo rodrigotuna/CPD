@@ -57,4 +57,8 @@ public class Ring {
     public boolean isFirst(String hashId) {
         return ring.firstKey().equals(hashId);
     }
+
+    public int numClients(){
+        return ring.size();
+    }
 }

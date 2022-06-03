@@ -5,7 +5,7 @@ import server.State;
 
 public class PeriodicMembershipRecovery implements Runnable{
     private final Node node;
-    PeriodicMembershipRecovery(Node node){
+    public PeriodicMembershipRecovery(Node node){
         this.node = node;
     }
     @Override
@@ -17,11 +17,11 @@ public class PeriodicMembershipRecovery implements Runnable{
             node.setMembershipRunning(false);
         } else {
             if (node.getRing().isFirst(node.getHashId())) {
-                node.executeThread(new PeriodicMembership(node));
+                node.executeThread(new PeriodicMembership(node, node.getMembershipLog().getPenalty()));
             } else {
 
             }
         }
-        node.scheduleThread(new PeriodicMembershipRecovery(node), 4000);
+        node.scheduleThread(new PeriodicMembershipRecovery(node), Math.max(4, node.getRing().numClients())*1000);
     }
 }
