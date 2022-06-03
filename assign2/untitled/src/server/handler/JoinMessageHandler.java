@@ -76,7 +76,6 @@ public class JoinMessageHandler implements Runnable{
                         file.delete();
                     }
                 }
-                node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
             } else if (node.getRing().getResponsible(joinMessage.getSenderId()).get(2).equals(node.getAccessPoint())){
                 node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
                 List<File> backup2 = node.getFileSystem().getFiles(2);
