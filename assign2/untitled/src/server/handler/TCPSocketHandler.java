@@ -58,7 +58,6 @@ public class TCPSocketHandler implements Runnable{
                 InputStream inputStream = socket.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String header = bufferedReader.readLine();
-                System.out.println(header);
                 TCPMessage message = new MessageParser().parseHeader(header);
 
                 OutputStream outputStream = socket.getOutputStream();

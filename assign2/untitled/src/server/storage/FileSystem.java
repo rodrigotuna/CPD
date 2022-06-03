@@ -69,11 +69,15 @@ public class FileSystem {
     }
 
     public List<File> getFiles(int factor) {
-        System.out.println("PATH: " + path + factor);
         File dir = new File(path + factor);
         if(dir.listFiles() != null)
             return Arrays.stream(Objects.requireNonNull(dir.listFiles()))
                 .collect(Collectors.toList());
         return new ArrayList<>();
+    }
+
+    public void changeFolder(int factor, File file){
+        File dest = new File(path + factor + "/" + file.getName());
+        file.renameTo(dest);
     }
 }

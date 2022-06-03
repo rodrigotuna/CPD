@@ -27,7 +27,7 @@ public class MessageParser {
             case "JOIN":
                 return new JoinMessage(senderId, socketAddress, Integer.parseInt(headerFields[2]), headerFields[3]);
             case "LEAVE":
-                return new LeaveMessage(senderId, socketAddress, Integer.parseInt(headerFields[2]));
+                return new LeaveMessage(senderId, socketAddress, Integer.parseInt(headerFields[2]), headerFields[3]);
         }
         return null;
     }

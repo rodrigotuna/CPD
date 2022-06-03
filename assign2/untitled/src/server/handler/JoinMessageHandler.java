@@ -46,20 +46,45 @@ public class JoinMessageHandler implements Runnable{
         } catch (IOException | URISyntaxException | InterruptedException ignored) {
 
         } finally {
-            System.out.println("RESPONSIBLE SENDER: " + node.getRing().getResponsible(joinMessage.getSenderId()));
-            System.out.println("ACCESS POINT: " + node.getAccessPoint());
             if(node.getRing().getResponsible(joinMessage.getSenderId()).get(0).equals(node.getAccessPoint())){
                 node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
-                for(int i = 0; i < Ring.REPLICATION_FACTOR; i++){
-                    List<File> prevFiles = node.getFileSystem().getFiles(i);
-                    for(File file : prevFiles){
-                        // TODO: Não sei se está a apagar direito
-                        if(node.getRing().getResponsible(file.getName()).get(i).equals(joinMessage.getAccessPoint())){
-                            node.executeThread(new FileTransferHandler(file, joinMessage.getAccessPoint(), node, i, true));
-                        }
+                List<File> backup2 = node.getFileSystem().getFiles(2);
+                for(File file : backup2){
+                    node.executeThread(new FileTransferHandler(file, joinMessage.getAccessPoint(), node, 2, true));
+                }
+                List<File> backup1 = node.getFileSystem().getFiles(1);
+                for(File file : backup1){
+                    node.executeThread(new FileTransferHandler(file, joinMessage.getAccessPoint(), node, 1, false));
+                    node.getFileSystem().changeFolder(2, file);
+                }
+                List<File> myFiles = node.getFileSystem().getFiles(0);
+                for(File file : myFiles){
+                    if(node.getRing().getResponsible(file.getName()).get(0).equals(joinMessage.getAccessPoint())){
+                        node.executeThread(new FileTransferHandler(file, joinMessage.getAccessPoint(), node, 0, true));
                     }
                 }
 
+            }else if(node.getRing().getResponsible(joinMessage.getSenderId()).get(1).equals(node.getAccessPoint())){
+                node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
+                List<File> backup1 = node.getFileSystem().getFiles(1);
+                List<File> backup2 = node.getFileSystem().getFiles(2);
+                for(File file : backup2){
+                    file.delete();
+                }
+                for(File file : backup1){
+                    if(node.getRing().getResponsible(file.getName()).get(0).equals(joinMessage.getAccessPoint())) {
+                        file.delete();
+                    }
+                }
+                node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
+            } else if (node.getRing().getResponsible(joinMessage.getSenderId()).get(2).equals(node.getAccessPoint())){
+                node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
+                List<File> backup2 = node.getFileSystem().getFiles(2);
+                for(File file : backup2){
+                    if(node.getRing().getResponsible(file.getName()).get(0).equals(joinMessage.getAccessPoint())) {
+                        file.delete();
+                    }
+                }
             }else{
                 node.getRing().addMember(joinMessage.getSenderId(), joinMessage.getAccessPoint());
             }
